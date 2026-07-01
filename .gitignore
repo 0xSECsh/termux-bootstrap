@@ -1,0 +1,41 @@
+# Logs
+logs/*
+!logs/.gitkeep
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Rust
+target/
+
+# Go
+bin/
+
+# Environment
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Termux
+.storage
+
+# Backup files
+*.orig
