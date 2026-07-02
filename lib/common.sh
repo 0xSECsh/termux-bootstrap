@@ -109,6 +109,8 @@ framework_initialize() {
 
 	load_library "$LIB_DIR/../modules/config_engine.sh"
 
+	load_library "$LIB_DIR/../modules/installer_engine.sh"
+
 	load_library "$LIB_DIR/core/environment.sh"
 
 	load_library "$LIB_DIR/core/version.sh"

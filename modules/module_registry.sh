@@ -84,7 +84,10 @@ _module_extract_dependencies() {
 	while IFS= read -r line; do
 		case "$line" in
 		"# Depends:"*)
-			printf '%s' "${line#\# Depends: }"
+			local deps="${line#\# Depends:}"
+			deps="${deps##[[:space:]]}"
+			deps="${deps%%[[:space:]]}"
+			printf '%s' "$deps"
 			return 0
 			;;
 		esac
