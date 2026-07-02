@@ -25,6 +25,12 @@ cmd_config() {
 	reset)
 		cmd_config_reset "$@"
 		;;
+	validate)
+		cmd_config_validate "$@"
+		;;
+	merge)
+		cmd_config_merge "$@"
+		;;
 	-h | --help)
 		_config_help
 		;;
@@ -40,37 +46,17 @@ cmd_config() {
 # ------------------------------------------------------------------------------
 
 cmd_config_list() {
-	local config_dir="${CONFIGS_DIR}"
-
-	if ! directory_exists "$config_dir"; then
-		log_error "Config directory not found: ${config_dir}"
-		return "$EXIT_FAILURE"
-	fi
-
 	ui_section "Available Configuration Files"
 
-	local found=false
-	local app_name app_dir app_file
+	local count
+	count="$(config_count)"
 
-	for app_dir in "$config_dir"/*/; do
-		[[ -d "$app_dir" ]] || continue
-		app_name="$(basename "$app_dir")"
-
-		local app_file
-		for app_file in "$app_dir".* "$app_dir"*; do
-			[[ -f "$app_file" ]] || continue
-			local filename
-			filename="$(basename "$app_file")"
-
-			ui_bullet "${app_name}/${filename}"
-			found=true
-		done
-	done
-
-	if [[ "$found" == false ]]; then
+	if [[ "$count" -eq 0 ]]; then
 		log_info "No configuration files found."
+		return 0
 	fi
 
+	config_list
 	printf "\n"
 }
 
@@ -79,48 +65,25 @@ cmd_config_list() {
 # ------------------------------------------------------------------------------
 
 cmd_config_show() {
-	local config_dir="${CONFIGS_DIR}"
-
-	if ! directory_exists "$config_dir"; then
-		log_error "Config directory not found: ${config_dir}"
-		return "$EXIT_FAILURE"
-	fi
-
 	ui_section "Configuration Files"
 
-	local found=false
-	local app_name app_dir app_file user_file status
+	local config_list_output
+	config_list_output="$(config_list)"
 
-	for app_dir in "$config_dir"/*/; do
-		[[ -d "$app_dir" ]] || continue
-		app_name="$(basename "$app_dir")"
-
-		local app_file
-		for app_file in "$app_dir".* "$app_dir"*; do
-			[[ -f "$app_file" ]] || continue
-			local filename
-			filename="$(basename "$app_file")"
-
-			user_file="$(_get_user_config_path "$app_name" "$filename")"
-
-			if [[ -n "$user_file" ]] && [[ -f "$user_file" ]]; then
-				if diff -q "$app_file" "$user_file" >/dev/null 2>&1; then
-					status="installed (up to date)"
-				else
-					status="installed (modified)"
-				fi
-			else
-				status="not installed"
-			fi
-
-			ui_key_value "  ${app_name}/${filename}" "$status"
-			found=true
-		done
-	done
-
-	if [[ "$found" == false ]]; then
+	if [[ -z "$config_list_output" ]]; then
 		log_info "No configuration files found."
+		return 0
 	fi
+
+	local app_name filename status
+	while IFS= read -r line; do
+		[[ -z "$line" ]] && continue
+		app_name="${line%%/*}"
+		filename="${line#*/}"
+		filename="${filename%% *}"
+		status="$(config_status "$app_name" "$filename")"
+		ui_key_value "  ${app_name}/${filename}" "$status"
+	done <<< "$config_list_output"
 
 	printf "\n"
 }
@@ -129,7 +92,7 @@ cmd_config_show() {
 # Config Edit - Open config file in editor
 # ------------------------------------------------------------------------------
 
-	cmd_config_edit() {
+cmd_config_edit() {
 	local target="${1:-}"
 	local editor="${EDITOR:-${DEFAULT_EDITOR}}"
 
@@ -157,9 +120,6 @@ EOF
 	fi
 
 	local app_name filename
-	app_name="$(dirname "$target" | cut -d'/' -f1)"
-	filename="$(basename "$target")"
-
 	if [[ "$target" == *"/"* ]]; then
 		app_name="$(echo "$target" | cut -d'/' -f1)"
 		filename="$(echo "$target" | cut -d'/' -f2)"
@@ -170,7 +130,7 @@ EOF
 	fi
 
 	local user_file
-	user_file="$(_get_user_config_path "$app_name" "$filename")"
+	user_file="$(config_resolve_path "$app_name" "$filename")"
 
 	if [[ -z "$user_file" ]]; then
 		log_error "Cannot determine config path for: ${target}"
@@ -202,7 +162,7 @@ EOF
 # Config Reset - Restore config to defaults
 # ------------------------------------------------------------------------------
 
-	cmd_config_reset() {
+cmd_config_reset() {
 	local target="${1:-}"
 
 	if [[ -z "$target" ]] || [[ "$target" == "-h" ]] || [[ "$target" == "--help" ]]; then
@@ -240,7 +200,7 @@ EOF
 
 	local source_file="${CONFIGS_DIR}/${app_name}/${filename}"
 	local user_file
-	user_file="$(_get_user_config_path "$app_name" "$filename")"
+	user_file="$(config_resolve_path "$app_name" "$filename")"
 
 	if [[ ! -f "$source_file" ]]; then
 		log_error "Default config not found: ${source_file}"
@@ -269,6 +229,107 @@ EOF
 }
 
 # ------------------------------------------------------------------------------
+# Config Validate - Validate configuration files
+# ------------------------------------------------------------------------------
+
+cmd_config_validate() {
+	local target="${1:-}"
+
+	if [[ "$target" == "-h" ]] || [[ "$target" == "--help" ]]; then
+		cat <<'EOF'
+Usage: bootstrap config validate [app/filename]
+
+Validate configuration files. If no target is specified, validates all.
+
+Arguments:
+  <app/filename>    Config file in format: app/filename (optional)
+
+Options:
+  -h, --help        Show this help
+
+Examples:
+  bootstrap config validate
+  bootstrap config validate zsh/.zshrc
+EOF
+		return 0
+	fi
+
+	if [[ -n "$target" ]]; then
+		local app_name filename
+		if [[ "$target" == *"/"* ]]; then
+			app_name="$(echo "$target" | cut -d'/' -f1)"
+			filename="$(echo "$target" | cut -d'/' -f2)"
+		else
+			log_error "Usage: config validate <app/filename>"
+			return "$EXIT_INVALID_ARGUMENT"
+		fi
+
+		if config_validate "$app_name" "$filename"; then
+			log_success "Config valid: ${target}"
+		else
+			log_error "Config invalid: ${target}"
+			return "$EXIT_FAILURE"
+		fi
+	else
+		ui_section "Validating Configuration Files"
+		config_validate_all
+	fi
+}
+
+# ------------------------------------------------------------------------------
+# Config Merge - Merge user config with defaults
+# ------------------------------------------------------------------------------
+
+cmd_config_merge() {
+	local target="${1:-}"
+	local overwrite=false
+
+	if [[ "$target" == "-h" ]] || [[ "$target" == "--help" ]]; then
+		cat <<'EOF'
+Usage: bootstrap config merge [app/filename] [--overwrite]
+
+Merge default configuration with user configuration.
+
+Arguments:
+  <app/filename>    Config file in format: app/filename (optional)
+
+Options:
+  --overwrite       Overwrite user config with defaults
+  -h, --help        Show this help
+
+Examples:
+  bootstrap config merge
+  bootstrap config merge zsh/.zshrc
+  bootstrap config merge git/.gitconfig --overwrite
+EOF
+		return 0
+	fi
+
+	# Check for --overwrite flag
+	for arg in "$@"; do
+		if [[ "$arg" == "--overwrite" ]]; then
+			overwrite=true
+		fi
+	done
+
+	if [[ -n "$target" ]] && [[ "$target" != "--overwrite" ]]; then
+		local app_name filename
+		if [[ "$target" == *"/"* ]]; then
+			app_name="$(echo "$target" | cut -d'/' -f1)"
+			filename="$(echo "$target" | cut -d'/' -f2)"
+		else
+			log_error "Usage: config merge <app/filename>"
+			return "$EXIT_INVALID_ARGUMENT"
+		fi
+
+		config_merge "$app_name" "$filename" "$overwrite"
+	else
+		ui_section "Merging Configuration Files"
+		config_merge_all "$overwrite"
+	fi
+}
+
+# ------------------------------------------------------------------------------
 # Help
 # ------------------------------------------------------------------------------
 
@@ -279,60 +340,26 @@ Usage: bootstrap config <subcommand> [options]
 Manage configuration files for installed applications.
 
 Subcommands:
-  list            List available configuration files
-  show            Show current configuration status
-  edit <file>     Open a configuration file in editor
-  reset <file>    Reset a configuration file to defaults
+  list              List available configuration files
+  show              Show current configuration status
+  edit <file>       Open a configuration file in editor
+  reset <file>      Reset a configuration file to defaults
+  validate [file]   Validate configuration files
+  merge [file]      Merge user config with defaults
 
 Arguments:
-  <file>          Config file in format: app/filename
-                  Examples: zsh/.zshrc, git/.gitconfig
+  <file>            Config file in format: app/filename
+                    Examples: zsh/.zshrc, git/.gitconfig
 
 Options:
-  -h, --help      Show this help
+  --overwrite       Overwrite user config with defaults (for merge)
+  -h, --help        Show help for command
 
 Examples:
   bootstrap config show
   bootstrap config edit zsh/.zshrc
   bootstrap config reset git/.gitconfig
+  bootstrap config validate
+  bootstrap config merge zsh/.zshrc --overwrite
 EOF
-}
-
-# ------------------------------------------------------------------------------
-# Helper: Get user config path
-# ------------------------------------------------------------------------------
-
-_get_user_config_path() {
-	local app_name="$1"
-	local filename="$2"
-
-	case "$app_name" in
-	zsh)
-		if [[ "$filename" == ".zshrc" ]]; then
-			echo "${HOME}/.zshrc"
-		fi
-		;;
-	git)
-		if [[ "$filename" == ".gitconfig" ]]; then
-			echo "${HOME}/.gitconfig"
-		fi
-		;;
-	tmux)
-		if [[ "$filename" == ".tmux.conf" ]]; then
-			echo "${HOME}/.tmux.conf"
-		fi
-		;;
-	nvim)
-		echo "${HOME}/.config/nvim/${filename}"
-		;;
-	micro)
-		echo "${HOME}/.config/micro/settings.json"
-		;;
-	fastfetch)
-		echo "${HOME}/.config/fastfetch/${filename}"
-		;;
-	*)
-		echo "${HOME}/.config/${app_name}/${filename}"
-		;;
-	esac
 }
