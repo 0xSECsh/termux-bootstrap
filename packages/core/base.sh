@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/core/base.sh
 # Description: Base system packages
+# Depends:
 # ==============================================================================
 
 install_core_base() {

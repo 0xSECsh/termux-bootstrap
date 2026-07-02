@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/core/shell.sh
 # Description: Shell and terminal enhancement packages
+# Depends: core/base
 # ==============================================================================
 
 install_core_shell() {

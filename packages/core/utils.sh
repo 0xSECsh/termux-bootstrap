@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/core/utils.sh
 # Description: General utility packages
+# Depends: core/base
 # ==============================================================================
 
 install_core_utils() {

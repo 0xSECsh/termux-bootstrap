@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/ai/ai.sh
 # Description: AI and machine learning packages
+# Depends: core/base development/python
 # ==============================================================================
 
 install_ai_ai() {

@@ -42,37 +42,6 @@ load_command() {
 }
 
 # ------------------------------------------------------------------------------
-# Module Loader (used by profiles)
-# ------------------------------------------------------------------------------
-
-load_module() {
-	local category="$1"
-	local module="$2"
-
-	local module_file="${PACKAGES_DIR}/${category}/${module}.sh"
-
-	if [[ ! -f "$module_file" ]]; then
-		log_warning "Module not found: ${category}/${module}"
-		return 1
-	fi
-
-	# shellcheck disable=SC1090
-	source "$module_file"
-
-	local sanitized="${module//-/_}"
-	local func_name="install_${category}_${sanitized}"
-
-	if ! declare -F "$func_name" >/dev/null 2>&1; then
-		log_warning "Module '${category}/${module}' has no install function"
-		return 0
-	fi
-
-	ui_section "Module: ${category}/${module}"
-
-	"$func_name"
-}
-
-# ------------------------------------------------------------------------------
 # Dispatcher
 # ------------------------------------------------------------------------------
 
