@@ -7,8 +7,8 @@
 # ==============================================================================
 
 COMMANDS_DIR="${LIB_DIR}/../commands"
+# shellcheck disable=SC2034
 PACKAGES_DIR="${LIB_DIR}/../packages"
-PROFILE_DIR="${PACKAGES_DIR}/profiles"
 
 # Supported commands
 declare -gA COMMANDS=(
@@ -106,63 +106,17 @@ EOF
 }
 
 # ------------------------------------------------------------------------------
-# Profile Functions
+# Profile Functions (delegated to profile_loader.sh and profile_registry.sh)
 # ------------------------------------------------------------------------------
 
 list_profiles() {
-	if ! directory_exists "$PROFILE_DIR"; then
-		log_error "Profile directory not found: ${PROFILE_DIR}"
-		return 1
-	fi
-
-	local profiles=("$PROFILE_DIR"/*.sh)
-
-	if [[ ${#profiles[@]} -eq 0 ]] || [[ ! -f "${profiles[0]}" ]]; then
-		log_info "No profiles available."
-		return 0
-	fi
-
-	ui_section "Available Profiles"
-
-	local profile
-	for profile in "${profiles[@]}"; do
-		profile="$(basename "$profile" .sh)"
-		ui_bullet "$profile"
-	done
-
-	printf "\n"
+	profile_list
 }
 
 install_profile() {
-	local name="$1"
-
-	if [[ -z "$name" ]]; then
-		log_error "No profile specified."
-		return 1
-	fi
-
-	local profile_file="${PROFILE_DIR}/${name}.sh"
-
-	if [[ ! -f "$profile_file" ]]; then
-		log_error "Profile not found: ${name}"
-		return 1
-	fi
-
-	# shellcheck disable=SC1090
-	source "$profile_file"
-
-	local func_name="install_profile_${name}"
-
-	if ! declare -F "$func_name" >/dev/null 2>&1; then
-		log_warning "Profile '${name}' has no install function yet"
-		return 0
-	fi
-
-	ui_section "Installing: ${name}"
-
-	"$func_name"
+	load_profile "$@"
 }
 
 install_all_profiles() {
-	install_profile "full"
+	load_profile "full"
 }

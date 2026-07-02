@@ -103,6 +103,10 @@ framework_initialize() {
 
 	load_library "$LIB_DIR/../modules/module_loader.sh"
 
+	load_library "$LIB_DIR/../modules/profile_registry.sh"
+
+	load_library "$LIB_DIR/../modules/profile_loader.sh"
+
 	load_library "$LIB_DIR/core/environment.sh"
 
 	load_library "$LIB_DIR/core/version.sh"
