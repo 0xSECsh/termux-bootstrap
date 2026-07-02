@@ -3,7 +3,7 @@
 # ==============================================================================
 # Termux Bootstrap
 # File: bootstrap.sh
-# Description: Project entry point
+# Description: Project entry point - CLI Dispatcher
 # ==============================================================================
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
@@ -13,4 +13,4 @@ source "${SOURCE_DIR}/lib/common.sh"
 
 framework_initialize
 
-parse_cli "$@"
+dispatch "$@"

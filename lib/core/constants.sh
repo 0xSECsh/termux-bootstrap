@@ -29,6 +29,8 @@ readonly HOME_DIR="${HOME}"
 
 readonly CONFIG_DIR="${HOME_DIR}/.config/${PROJECT_SLUG}"
 
+readonly CONFIGS_DIR="${LIB_DIR}/../configs"
+
 readonly CACHE_DIR="${HOME_DIR}/.cache/${PROJECT_SLUG}"
 
 readonly DATA_DIR="${HOME_DIR}/.local/share/${PROJECT_SLUG}"
@@ -137,6 +139,7 @@ export \
 	PROJECT_VERSION \
 	HOME_DIR \
 	CONFIG_DIR \
+	CONFIGS_DIR \
 	CACHE_DIR \
 	DATA_DIR \
 	LOG_DIR \

@@ -353,23 +353,15 @@ teardown() {
 # CLI Integration
 # ------------------------------------------------------------------------------
 
-@test "show_usage displays options" {
+@test "dispatch_help displays command options" {
 
-	run show_usage
+	run dispatch_help
 
-	assert_output_contains "--help"
+	assert_output_contains "help"
 
-	assert_output_contains "--profile"
+	assert_output_contains "version"
 
-	assert_output_contains "--list"
-
-}
-
-@test "show_usage displays --all" {
-
-	run show_usage
-
-	assert_output_contains "--all"
+	assert_output_contains "doctor"
 
 }
 
@@ -383,9 +375,9 @@ teardown() {
 
 }
 
-@test "parse_cli with --version calls show_version" {
+@test "dispatch with --version shows version" {
 
-	run parse_cli --version
+	run dispatch version
 
 	assert_status_zero
 
@@ -393,58 +385,12 @@ teardown() {
 
 }
 
-@test "parse_cli with --help calls show_usage" {
+@test "dispatch with help shows help" {
 
-	run parse_cli --help
-
-	assert_status_zero
-
-	assert_output_contains "--help"
-
-}
-
-@test "parse_cli with --about calls show_about" {
-
-	run parse_cli --about
+	run dispatch help
 
 	assert_status_zero
 
-	assert_output_contains "$PROJECT_AUTHOR"
-
-}
-
-@test "parse_cli with --list calls list_profiles" {
-
-	run parse_cli --list
-
-	assert_status_zero
-
-	assert_output_contains "Profiles"
-
-}
-
-@test "parse_cli with unknown flag returns error" {
-
-	run parse_cli --unknown-flag
-
-	assert_status_error 2
-
-}
-
-@test "parse_cli with no arguments shows usage" {
-
-	run parse_cli
-
-	assert_status_zero
-
-	assert_output_contains "--help"
-
-}
-
-@test "parse_cli with --profile missing name returns error" {
-
-	run parse_cli --profile
-
-	assert_status_error 2
+	assert_output_contains "help"
 
 }

@@ -109,7 +109,7 @@ framework_initialize() {
 
 	load_library "$LIB_DIR/terminal/ui.sh"
 
-	load_library "$LIB_DIR/core/cli.sh"
+	load_library "$LIB_DIR/core/dispatcher.sh"
 
 	register_error_handlers
 

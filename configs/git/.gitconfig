@@ -1,0 +1,12 @@
+[user]
+	name = Termux User
+	email = user@termux.dev
+
+[core]
+	editor = micro
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
