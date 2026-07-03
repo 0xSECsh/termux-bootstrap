@@ -1,0 +1,15 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # General Discussion
+
+        Welcome to the Termux Bootstrap community!
+        Use this category for topics that don't fit elsewhere.
+
+  - type: textarea
+    id: body
+    attributes:
+      label: Discussion
+    validations:
+      required: true

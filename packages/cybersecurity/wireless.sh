@@ -8,11 +8,11 @@
 
 install_cybersecurity_wireless() {
 
-	pkg_install_many \
-		aircrack-ng \
-		reaver \
-		wifite \
-		bettercap \
-		pixiewps
+        pkg_install_many \
+                aircrack-ng \
+                reaver \
+                wifite \
+                bettercap \
+                pixiewps
 
 }

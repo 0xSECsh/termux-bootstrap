@@ -14,12 +14,12 @@
 
 create_secure_temp_dir() {
 
-	local prefix="${1:-${PROJECT_SLUG}}"
-	local temp_dir
+        local prefix="${1:-${PROJECT_SLUG}}"
+        local temp_dir
 
-	temp_dir="$(mktemp -d -p "${TEMP_DIR}" "${prefix}.XXXXXX")" || die "Failed to create secure temp directory"
+        temp_dir="$(mktemp -d -p "${TEMP_DIR}" "${prefix}.XXXXXX")" || die "Failed to create secure temp directory"
 
-	printf "%s\n" "$temp_dir"
+        printf "%s\n" "$temp_dir"
 
 }
 
@@ -29,12 +29,12 @@ create_secure_temp_dir() {
 
 create_secure_temp_file() {
 
-	local prefix="${1:-${PROJECT_SLUG}}"
-	local temp_file
+        local prefix="${1:-${PROJECT_SLUG}}"
+        local temp_file
 
-	temp_file="$(mktemp -p "${TEMP_DIR}" "${prefix}.XXXXXX")" || die "Failed to create secure temp file"
+        temp_file="$(mktemp -p "${TEMP_DIR}" "${prefix}.XXXXXX")" || die "Failed to create secure temp file"
 
-	printf "%s\n" "$temp_file"
+        printf "%s\n" "$temp_file"
 
 }
 
@@ -44,25 +44,25 @@ create_secure_temp_file() {
 
 write_temp_file() {
 
-	local content="$1"
-	local prefix="${2:-${PROJECT_SLUG}}"
+        local content="$1"
+        local prefix="${2:-${PROJECT_SLUG}}"
 
-	local temp_file
-	temp_file="$(create_secure_temp_file "$prefix")"
+        local temp_file
+        temp_file="$(create_secure_temp_file "$prefix")"
 
-	printf "%s\n" "$content" >"$temp_file" || die "Failed to write temp file: ${temp_file}"
+        printf "%s\n" "$content" >"$temp_file" || die "Failed to write temp file: ${temp_file}"
 
-	printf "%s\n" "$temp_file"
+        printf "%s\n" "$temp_file"
 
 }
 
 read_temp_file() {
 
-	local file="$1"
+        local file="$1"
 
-	[[ -f "$file" ]] || die "Temp file not found: ${file}"
+        [[ -f "$file" ]] || die "Temp file not found: ${file}"
 
-	cat "$file"
+        cat "$file"
 
 }
 
@@ -72,15 +72,15 @@ read_temp_file() {
 
 atomic_write() {
 
-	local target="$1"
-	local content="$2"
+        local target="$1"
+        local content="$2"
 
-	local temp_file
-	temp_file="$(create_secure_temp_file "atomic")"
+        local temp_file
+        temp_file="$(create_secure_temp_file "atomic")"
 
-	printf "%s\n" "$content" >"$temp_file" || die "Failed to write atomic temp file"
+        printf "%s\n" "$content" >"$temp_file" || die "Failed to write atomic temp file"
 
-	mv -- "$temp_file" "$target" || die "Failed to atomically write: ${target}"
+        mv -- "$temp_file" "$target" || die "Failed to atomically write: ${target}"
 
 }
 
@@ -90,31 +90,31 @@ atomic_write() {
 
 cleanup_temp_file() {
 
-	local file="$1"
+        local file="$1"
 
-	[[ -n "$file" ]] || return 0
+        [[ -n "$file" ]] || return 0
 
-	[[ "$file" == "${TEMP_DIR}"* ]] || {
-		log_warning "Refusing to delete file outside temp dir: ${file}"
-		return 1
-	}
+        [[ "$file" == "${TEMP_DIR}"* ]] || {
+                log_warning "Refusing to delete file outside temp dir: ${file}"
+                return 1
+        }
 
-	[[ -f "$file" ]] && rm -f -- "$file"
+        [[ -f "$file" ]] && rm -f -- "$file"
 
 }
 
 cleanup_temp_dir() {
 
-	local dir="$1"
+        local dir="$1"
 
-	[[ -n "$dir" ]] || return 0
+        [[ -n "$dir" ]] || return 0
 
-	[[ "$dir" == "${TEMP_DIR}"* ]] || {
-		log_warning "Refusing to delete directory outside temp dir: ${dir}"
-		return 1
-	}
+        [[ "$dir" == "${TEMP_DIR}"* ]] || {
+                log_warning "Refusing to delete directory outside temp dir: ${dir}"
+                return 1
+        }
 
-	[[ -d "$dir" ]] && rm -rf -- "$dir"
+        [[ -d "$dir" ]] && rm -rf -- "$dir"
 
 }
 
@@ -124,26 +124,26 @@ cleanup_temp_dir() {
 
 secure_cleanup_temp() {
 
-	local path="$1"
+        local path="$1"
 
-	[[ -n "$path" ]] || return 0
+        [[ -n "$path" ]] || return 0
 
-	[[ "$path" == "${TEMP_DIR}"* ]] || {
-		log_error "Path traversal attempt blocked: ${path}"
-		return 1
-	}
+        [[ "$path" == "${TEMP_DIR}"* ]] || {
+                log_error "Path traversal attempt blocked: ${path}"
+                return 1
+        }
 
-	if [[ -f "$path" ]]; then
+        if [[ -f "$path" ]]; then
 
-		shred -u "$path" 2>/dev/null || rm -f -- "$path"
+                shred -u "$path" 2>/dev/null || rm -f -- "$path"
 
-	elif [[ -d "$path" ]]; then
+        elif [[ -d "$path" ]]; then
 
-		find "$path" -type f -exec shred -u {} + 2>/dev/null || true
+                find "$path" -type f -exec shred -u {} + 2>/dev/null || true
 
-		rm -rf -- "$path"
+                rm -rf -- "$path"
 
-	fi
+        fi
 
 }
 
@@ -153,56 +153,56 @@ secure_cleanup_temp() {
 
 with_temp_dir() {
 
-	local prefix="${1:-${PROJECT_SLUG}}"
-	local callback="${2:-}"
+        local prefix="${1:-${PROJECT_SLUG}}"
+        local callback="${2:-}"
 
-	local temp_dir
-	temp_dir="$(create_secure_temp_dir "$prefix")"
+        local temp_dir
+        temp_dir="$(create_secure_temp_dir "$prefix")"
 
-	if [[ -n "$callback" ]]; then
+        if [[ -n "$callback" ]]; then
 
-		(cd "$temp_dir" && eval "$callback")
+                (cd "$temp_dir" && eval "set -- '$temp_dir'; $callback")
 
-		local exit_code=$?
+                local exit_code=$?
 
-		secure_cleanup_temp "$temp_dir"
+                secure_cleanup_temp "$temp_dir"
 
-		return $exit_code
+                return $exit_code
 
-	else
+        else
 
-		printf "%s\n" "$temp_dir"
+                printf "%s\n" "$temp_dir"
 
-	fi
+        fi
 
 }
 
 with_temp_file() {
 
-	local prefix="${1:-${PROJECT_SLUG}}"
-	local content="${2:-}"
-	local callback="${3:-}"
+        local prefix="${1:-${PROJECT_SLUG}}"
+        local content="${2:-}"
+        local callback="${3:-}"
 
-	local temp_file
-	temp_file="$(create_secure_temp_file "$prefix")"
+        local temp_file
+        temp_file="$(create_secure_temp_file "$prefix")"
 
-	[[ -n "$content" ]] && printf "%s\n" "$content" >"$temp_file"
+        [[ -n "$content" ]] && printf "%s\n" "$content" >"$temp_file"
 
-	if [[ -n "$callback" ]]; then
+        if [[ -n "$callback" ]]; then
 
-		eval "$callback" "$temp_file"
+                eval "set -- '$temp_file'; $callback"
 
-		local exit_code=$?
+                local exit_code=$?
 
-		secure_cleanup_temp "$temp_file"
+                secure_cleanup_temp "$temp_file"
 
-		return $exit_code
+                return $exit_code
 
-	else
+        else
 
-		printf "%s\n" "$temp_file"
+                printf "%s\n" "$temp_file"
 
-	fi
+        fi
 
 }
 
@@ -214,23 +214,23 @@ declare -ag TEMP_CLEANUP_STACK=()
 
 register_temp_cleanup() {
 
-	local path="$1"
+        local path="$1"
 
-	TEMP_CLEANUP_STACK+=("$path")
+        TEMP_CLEANUP_STACK+=("$path")
 
 }
 
 run_temp_cleanup() {
 
-	local path
+        local path
 
-	for path in "${TEMP_CLEANUP_STACK[@]}"; do
+        for path in "${TEMP_CLEANUP_STACK[@]}"; do
 
-		secure_cleanup_temp "$path"
+                secure_cleanup_temp "$path"
 
-	done
+        done
 
-	TEMP_CLEANUP_STACK=()
+        TEMP_CLEANUP_STACK=()
 
 }
 
@@ -240,12 +240,16 @@ run_temp_cleanup() {
 
 setup_temp_cleanup_trap() {
 
-	[[ "${TEMP_CLEANUP_TRAP_SET:-false}" == true ]] && return 0
+        [[ "${TEMP_CLEANUP_TRAP_SET:-false}" == true ]] && return 0
 
-	trap 'run_temp_cleanup' EXIT INT TERM
+        [[ -n "${BATS_VERSION:-}" ]] && return 0
 
-	TEMP_CLEANUP_TRAP_SET=true
+        # Cleanup is dispatched by errors.sh's run_exit_handlers (EXIT trap),
+        # which calls run_temp_cleanup. Registering an EXIT/INT/TERM trap here
+        # would clobber the handlers set by errors.sh and terminal.sh.
 
-	export TEMP_CLEANUP_TRAP_SET
+        TEMP_CLEANUP_TRAP_SET=true
+
+        export TEMP_CLEANUP_TRAP_SET
 
 }

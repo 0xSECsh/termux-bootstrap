@@ -8,13 +8,13 @@
 
 install_cybersecurity_recon() {
 
-	pkg_install_many \
-		subfinder \
-		httpx \
-		nuclei \
-		naabu \
-		dnsx \
-		assetfinder \
-		amass
+        pkg_install_many \
+                subfinder \
+                httpx \
+                nuclei \
+                naabu \
+                dnsx \
+                assetfinder \
+                amass
 
 }

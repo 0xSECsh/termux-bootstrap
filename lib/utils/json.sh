@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 #
 # ==============================================================================
-# JSON Helpers
+# Termux Bootstrap
+# File: utils/json.sh
+# Description: JSON query helper using jq
 # ==============================================================================
 
 json_get() {
 
-	local file="$1"
-	local query="$2"
+        local file="$1"
+        local query="$2"
 
-	assert_command jq
+        assert_command jq
 
-	jq -r "$query" "$file"
+        jq -r "$query" "$file"
 
 }

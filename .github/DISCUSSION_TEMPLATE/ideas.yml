@@ -1,0 +1,41 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Ideas
+
+        Share your ideas for new features, modules, or profiles.
+        Before posting, search existing discussions to avoid duplicates.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your Idea
+      description: Describe your idea in detail
+      placeholder: "I think Termux Bootstrap should..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      description: What problem would this solve?
+      placeholder: "This would help users who..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: What area does this affect?
+      options:
+        - New module
+        - New profile
+        - CLI improvement
+        - Framework enhancement
+        - Documentation
+        - Other
+    validations:
+      required: true

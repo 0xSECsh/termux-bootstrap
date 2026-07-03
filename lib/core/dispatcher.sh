@@ -7,20 +7,21 @@
 # ==============================================================================
 
 COMMANDS_DIR="${LIB_DIR}/../commands"
-# shellcheck disable=SC2034
-PACKAGES_DIR="${LIB_DIR}/../packages"
+if [[ -z "${PACKAGES_DIR:-}" ]]; then
+        PACKAGES_DIR="${LIB_DIR}/../packages"
+fi
 
 # Supported commands
 declare -gA COMMANDS=(
-	[help]="help"
-	[version]="version"
-	[doctor]="doctor"
-	[install]="install"
-	[update]="update"
-	[module]="module"
-	[profile]="profile"
-	[config]="config"
-	[list]="list"
+        [help]="help"
+        [version]="version"
+        [doctor]="doctor"
+        [install]="install"
+        [update]="update"
+        [module]="module"
+        [profile]="profile"
+        [config]="config"
+        [list]="list"
 )
 
 # ------------------------------------------------------------------------------
@@ -28,17 +29,17 @@ declare -gA COMMANDS=(
 # ------------------------------------------------------------------------------
 
 load_command() {
-	local cmd="$1"
+        local cmd="$1"
 
-	local cmd_file="${COMMANDS_DIR}/${cmd}.sh"
+        local cmd_file="${COMMANDS_DIR}/${cmd}.sh"
 
-	if [[ ! -f "$cmd_file" ]]; then
-		log_error "Command not found: ${cmd}"
-		return 1
-	fi
+        if [[ ! -f "$cmd_file" ]]; then
+                log_error "Command not found: ${cmd}"
+                return 1
+        fi
 
-	# shellcheck disable=SC1090
-	source "$cmd_file"
+        # shellcheck disable=SC1090
+        source "$cmd_file"
 }
 
 # ------------------------------------------------------------------------------
@@ -46,25 +47,25 @@ load_command() {
 # ------------------------------------------------------------------------------
 
 dispatch() {
-	local cmd="${1:-help}"
-	shift || true
+        local cmd="${1:-help}"
+        shift || true
 
-	if [[ -z "${COMMANDS[$cmd]+x}" ]]; then
-		log_error "Unknown command: $cmd"
-		dispatch_help
-		return "$EXIT_INVALID_ARGUMENT"
-	fi
+        if [[ -z "${COMMANDS[$cmd]+x}" ]]; then
+                log_error "Unknown command: $cmd"
+                dispatch_help
+                return "$EXIT_INVALID_ARGUMENT"
+        fi
 
-	load_command "$cmd"
+        load_command "$cmd"
 
-	local func_name="cmd_${cmd}"
+        local func_name="cmd_${cmd}"
 
-	if ! declare -F "$func_name" >/dev/null 2>&1; then
-		log_error "Command handler not found: ${func_name}"
-		return "$EXIT_DEPENDENCY"
-	fi
+        if ! declare -F "$func_name" >/dev/null 2>&1; then
+                log_error "Command handler not found: ${func_name}"
+                return "$EXIT_DEPENDENCY"
+        fi
 
-	"$func_name" "$@"
+        "$func_name" "$@"
 }
 
 # ------------------------------------------------------------------------------
@@ -72,7 +73,7 @@ dispatch() {
 # ------------------------------------------------------------------------------
 
 dispatch_help() {
-	cat <<EOF
+        cat <<EOF
 Termux Bootstrap - Professional CLI Framework
 
 Usage: bootstrap <command> [options]
@@ -110,13 +111,13 @@ EOF
 # ------------------------------------------------------------------------------
 
 list_profiles() {
-	profile_list
+        profile_list
 }
 
 install_profile() {
-	load_profile "$@"
+        load_profile "$@"
 }
 
 install_all_profiles() {
-	load_profile "full"
+        load_profile "full"
 }

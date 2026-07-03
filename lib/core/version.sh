@@ -17,9 +17,9 @@
 
 show_version() {
 
-	printf "%s %s\n" \
-		"$PROJECT_NAME" \
-		"$PROJECT_VERSION"
+        printf "%s %s\n" \
+                "$PROJECT_NAME" \
+                "$PROJECT_VERSION"
 
 }
 
@@ -29,7 +29,7 @@ show_version() {
 
 show_banner() {
 
-	cat <<EOF
+        cat <<EOF
 
 ████████╗███████╗██████╗ ███╗   ███╗██╗   ██╗██╗  ██╗
 ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║   ██║╚██╗██╔╝
@@ -51,7 +51,7 @@ EOF
 
 show_about() {
 
-	cat <<EOF
+        cat <<EOF
 
 Project     : $PROJECT_NAME
 Version     : $PROJECT_VERSION
@@ -86,7 +86,7 @@ EOF
 
 show_license() {
 
-	cat <<EOF
+        cat <<EOF
 
 This project is distributed under the MIT License.
 
@@ -104,7 +104,7 @@ EOF
 
 show_build_info() {
 
-	cat <<EOF
+        cat <<EOF
 
 Project      : $PROJECT_NAME
 Version      : $PROJECT_VERSION
@@ -126,11 +126,11 @@ EOF
 
 show_help_header() {
 
-	show_banner
+        show_banner
 
-	printf "Usage:\n\n"
+        printf "Usage:\n\n"
 
-	printf "  bootstrap.sh [OPTIONS]\n\n"
+        printf "  bootstrap.sh [OPTIONS]\n\n"
 
 }
 
@@ -140,12 +140,12 @@ show_help_header() {
 
 show_info() {
 
-	show_banner
+        show_banner
 
-	show_about
+        show_about
 
-	printf "\n"
+        printf "\n"
 
-	show_build_info
+        show_build_info
 
 }

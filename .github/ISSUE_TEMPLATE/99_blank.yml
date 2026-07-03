@@ -1,0 +1,11 @@
+
+name: Blank Issue
+description: Open a blank issue (for maintainers only)
+labels: []
+body:
+  - type: textarea
+    id: content
+    attributes:
+      label: Issue
+    validations:
+      required: true

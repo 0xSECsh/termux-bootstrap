@@ -14,7 +14,7 @@
 
 cache_initialize() {
 
-	create_directory "$CACHE_DIR"
+        create_directory "$CACHE_DIR"
 
 }
 
@@ -24,9 +24,9 @@ cache_initialize() {
 
 cache_path() {
 
-	local key="$1"
+        local key="$1"
 
-	printf "%s/%s.cache\n" "$CACHE_DIR" "$key"
+        printf "%s/%s.cache\n" "$CACHE_DIR" "$key"
 
 }
 
@@ -36,12 +36,12 @@ cache_path() {
 
 cache_exists() {
 
-	local key="$1"
-	local file
+        local key="$1"
+        local file
 
-	file="$(cache_path "$key")"
+        file="$(cache_path "$key")"
 
-	[[ -f "$file" ]]
+        [[ -f "$file" ]]
 
 }
 
@@ -51,15 +51,15 @@ cache_exists() {
 
 cache_get() {
 
-	local key="$1"
+        local key="$1"
 
-	local file
+        local file
 
-	file="$(cache_path "$key")"
+        file="$(cache_path "$key")"
 
-	[[ -f "$file" ]] || return 1
+        [[ -f "$file" ]] || return 1
 
-	cat "$file"
+        cat "$file"
 
 }
 
@@ -69,18 +69,18 @@ cache_get() {
 
 cache_set() {
 
-	local key="$1"
-	local file
-	local tmp
+        local key="$1"
+        local file
+        local tmp
 
-	shift
+        shift
 
-	file="$(cache_path "$key")"
-	tmp="${file}.$$.$RANDOM"
+        file="$(cache_path "$key")"
+        tmp="${file}.$$.$RANDOM"
 
-	printf "%s\n" "$*" >"$tmp"
+        printf "%s\n" "$*" >"$tmp"
 
-	mv -- "$tmp" "$file"
+        mv -- "$tmp" "$file"
 
 }
 
@@ -90,12 +90,12 @@ cache_set() {
 
 cache_delete() {
 
-	local key="$1"
-	local file
+        local key="$1"
+        local file
 
-	file="$(cache_path "$key")"
+        file="$(cache_path "$key")"
 
-	rm -f -- "$file"
+        rm -f -- "$file"
 
 }
 
@@ -105,12 +105,12 @@ cache_delete() {
 
 cache_clear() {
 
-	[[ -n "$CACHE_DIR" && "$CACHE_DIR" != "/" ]] || return 1
+        [[ -n "$CACHE_DIR" && "$CACHE_DIR" != "/" ]] || return 1
 
-	find "$CACHE_DIR" \
-		-mindepth 1 \
-		-maxdepth 1 \
-		-exec rm -rf -- {} +
+        find "$CACHE_DIR" \
+                -mindepth 1 \
+                -maxdepth 1 \
+                -exec rm -rf -- {} +
 
 }
 
@@ -120,12 +120,12 @@ cache_clear() {
 
 cache_list() {
 
-	find "$CACHE_DIR" \
-		-maxdepth 1 \
-		-name "*.cache" \
-		-type f 2>/dev/null | while IFS= read -r file; do
-		basename "$file"
-	done
+        find "$CACHE_DIR" \
+                -maxdepth 1 \
+                -name "*.cache" \
+                -type f 2>/dev/null | while IFS= read -r file; do
+                basename "$file"
+        done
 
 }
 
@@ -135,15 +135,15 @@ cache_list() {
 
 cache_size() {
 
-	if [[ -d "$CACHE_DIR" ]]; then
+        if [[ -d "$CACHE_DIR" ]]; then
 
-		du -sh "$CACHE_DIR" 2>/dev/null | awk '{print $1}'
+                du -sh "$CACHE_DIR" 2>/dev/null | awk '{print $1}'
 
-	else
+        else
 
-		printf "0B\n"
+                printf "0B\n"
 
-	fi
+        fi
 
 }
 
@@ -153,19 +153,19 @@ cache_size() {
 
 cache_age() {
 
-	local key="$1"
+        local key="$1"
 
-	local file
+        local file
 
-	file="$(cache_path "$key")"
+        file="$(cache_path "$key")"
 
-	[[ -f "$file" ]] || return 1
+        [[ -f "$file" ]] || return 1
 
-	if stat -c "%Y" "$file" >/dev/null 2>&1; then
-		stat -c "%Y" "$file"
-	else
-		stat -f "%m" "$file"
-	fi
+        if stat -c "%Y" "$file" >/dev/null 2>&1; then
+                stat -c "%Y" "$file"
+        else
+                stat -f "%m" "$file"
+        fi
 
 }
 
@@ -175,26 +175,26 @@ cache_age() {
 
 cache_expired() {
 
-	local key="$1"
-	local ttl="$2"
+        local key="$1"
+        local ttl="$2"
 
-	local file
-	local now
-	local modified
+        local file
+        local now
+        local modified
 
-	file="$(cache_path "$key")"
+        file="$(cache_path "$key")"
 
-	[[ -f "$file" ]] || return 0
+        [[ -f "$file" ]] || return 0
 
-	if stat -c "%Y" "$file" >/dev/null 2>&1; then
-		modified="$(stat -c "%Y" "$file")"
-	else
-		modified="$(stat -f "%m" "$file")"
-	fi
+        if stat -c "%Y" "$file" >/dev/null 2>&1; then
+                modified="$(stat -c "%Y" "$file")"
+        else
+                modified="$(stat -f "%m" "$file")"
+        fi
 
-	now="$(date +%s)"
+        now="$(date +%s)"
 
-	((now - modified > ttl))
+        ((now - modified > ttl))
 
 }
 
@@ -204,30 +204,30 @@ cache_expired() {
 
 cache_remember() {
 
-	local key="$1"
-	local ttl="$2"
+        local key="$1"
+        local ttl="$2"
 
-	shift 2
+        shift 2
 
-	if cache_exists "$key"; then
+        if cache_exists "$key"; then
 
-		if ! cache_expired "$key" "$ttl"; then
+                if ! cache_expired "$key" "$ttl"; then
 
-			cache_get "$key"
+                        cache_get "$key"
 
-			return 0
+                        return 0
 
-		fi
+                fi
 
-	fi
+        fi
 
-	local output
+        local output
 
-	output="$("$@")"
+        output="$("$@")"
 
-	cache_set "$key" "$output"
+        cache_set "$key" "$output"
 
-	printf "%s\n" "$output"
+        printf "%s\n" "$output"
 
 }
 
@@ -237,14 +237,14 @@ cache_remember() {
 
 cache_statistics() {
 
-	printf "Cache Directory : %s\n" "$CACHE_DIR"
+        printf "Cache Directory : %s\n" "$CACHE_DIR"
 
-	printf "Cache Size      : %s\n" "$(cache_size)"
+        printf "Cache Size      : %s\n" "$(cache_size)"
 
-	printf "Entries         : "
+        printf "Entries         : "
 
-	find "$CACHE_DIR" \
-		-name "*.cache" \
-		-type f | wc -l
+        find "$CACHE_DIR" \
+                -name "*.cache" \
+                -type f | wc -l
 
 }

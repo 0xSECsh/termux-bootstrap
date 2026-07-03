@@ -1,0 +1,27 @@
+# ==============================================================================
+# CI — Push Trigger
+# ==============================================================================
+# Runs the full pipeline on every push to main branches.
+# ==============================================================================
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+      - "v[0-9]+.[0-9]+.**"
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "assets/**"
+      - "templates/**"
+
+jobs:
+  pipeline:
+    name: Pipeline (${{ github.ref_name }})
+    uses: ./.github/workflows/ci-pipeline.yml
+    with:
+      bash-version: "system"

@@ -8,18 +8,18 @@
 
 install_profile_osint() {
 
-	load_module core base
+        load_module core base
 
-	load_module core editors
+        load_module core editors
 
-	load_module core shell
+        load_module core shell
 
-	load_module core utils
+        load_module core utils
 
-	load_module cybersecurity osint
+        load_module cybersecurity osint
 
-	load_module cybersecurity recon
+        load_module cybersecurity recon
 
-	log_success "OSINT profile installed."
+        log_success "OSINT profile installed."
 
 }

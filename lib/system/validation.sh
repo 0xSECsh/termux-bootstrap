@@ -12,19 +12,19 @@
 
 command_exists() {
 
-	command -v "$1" >/dev/null 2>&1
+        command -v "$1" >/dev/null 2>&1
 
 }
 
 require_command() {
 
-	local cmd="$1"
+        local cmd="$1"
 
-	if ! command_exists "$cmd"; then
+        if ! command_exists "$cmd"; then
 
-		fatal "Required command not found: ${cmd}"
+                fatal "Required command not found: ${cmd}"
 
-	fi
+        fi
 
 }
 
@@ -34,26 +34,26 @@ require_command() {
 
 check_internet() {
 
-	command_exists ping || return 1
+        command_exists ping || return 1
 
-	case "$(uname -s)" in
-	Darwin)
-		ping -c 1 -t 1 1.1.1.1 >/dev/null 2>&1
-		;;
-	*)
-		ping -c 1 -W 1 1.1.1.1 >/dev/null 2>&1
-		;;
-	esac
+        case "$(uname -s)" in
+                Darwin)
+                        ping -c 1 -t 1 1.1.1.1 >/dev/null 2>&1
+                        ;;
+                *)
+                        ping -c 1 -W 1 1.1.1.1 >/dev/null 2>&1
+                        ;;
+        esac
 
 }
 
 require_internet() {
 
-	if ! check_internet; then
+        if ! check_internet; then
 
-		fatal "Internet connection required."
+                fatal "Internet connection required."
 
-	fi
+        fi
 
 }
 
@@ -63,17 +63,17 @@ require_internet() {
 
 is_termux() {
 
-	[[ -n "${TERMUX_VERSION:-}" ]]
+        [[ -n "${TERMUX_VERSION:-}" ]]
 
 }
 
 require_termux() {
 
-	if ! is_termux; then
+        if ! is_termux; then
 
-		fatal "This project must be executed inside Termux."
+                fatal "This project must be executed inside Termux."
 
-	fi
+        fi
 
 }
 
@@ -83,7 +83,7 @@ require_termux() {
 
 is_android() {
 
-	[[ -d "/system" ]]
+        [[ -d "/system" ]]
 
 }
 
@@ -93,19 +93,19 @@ is_android() {
 
 architecture() {
 
-	printf "%s\n" "${SYSTEM_ARCH:-$(uname -m)}"
+        printf "%s\n" "${SYSTEM_ARCH:-$(uname -m)}"
 
 }
 
 is_arm64() {
 
-	[[ "${SYSTEM_ARCH:-$(uname -m)}" == "aarch64" ]]
+        [[ "${SYSTEM_ARCH:-$(uname -m)}" == "aarch64" ]]
 
 }
 
 is_x86_64() {
 
-	[[ "${SYSTEM_ARCH:-$(uname -m)}" == "x86_64" ]]
+        [[ "${SYSTEM_ARCH:-$(uname -m)}" == "x86_64" ]]
 
 }
 
@@ -115,13 +115,13 @@ is_x86_64() {
 
 file_exists() {
 
-	[[ -f "$1" ]]
+        [[ -f "$1" ]]
 
 }
 
 directory_exists() {
 
-	[[ -d "$1" ]]
+        [[ -d "$1" ]]
 
 }
 
@@ -131,7 +131,7 @@ directory_exists() {
 
 variable_is_set() {
 
-	[[ -n "${!1:-}" ]]
+        [[ -n "${!1:-}" ]]
 
 }
 
@@ -141,10 +141,10 @@ variable_is_set() {
 
 confirm() {
 
-	local answer
+        local answer
 
-	read -rp "$1 [y/N]: " answer
+        read -rp "$1 [y/N]: " answer
 
-	[[ "$answer" =~ ^[Yy]$ ]]
+        [[ "$answer" =~ ^[Yy]$ ]]
 
 }

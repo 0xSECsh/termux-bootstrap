@@ -12,19 +12,19 @@
 
 terminal_width() {
 
-	tput cols 2>/dev/null || echo 80
+        tput cols 2>/dev/null || echo 80
 
 }
 
 terminal_height() {
 
-	tput lines 2>/dev/null || echo 24
+        tput lines 2>/dev/null || echo 24
 
 }
 
 terminal_size() {
 
-	printf "%sx%s\n" "$(terminal_width)" "$(terminal_height)"
+        printf "%sx%s\n" "$(terminal_width)" "$(terminal_height)"
 
 }
 
@@ -34,13 +34,13 @@ terminal_size() {
 
 terminal_clear() {
 
-	clear
+        clear
 
 }
 
 terminal_reset() {
 
-	reset
+        reset
 
 }
 
@@ -50,40 +50,40 @@ terminal_reset() {
 
 cursor_hide() {
 
-	tput civis 2>/dev/null
+        tput civis 2>/dev/null
 
 }
 
 cursor_show() {
 
-	tput cnorm 2>/dev/null
+        tput cnorm 2>/dev/null
 
 }
 
 cursor_save() {
 
-	tput sc 2>/dev/null
+        tput sc 2>/dev/null
 
 }
 
 cursor_restore() {
 
-	tput rc 2>/dev/null
+        tput rc 2>/dev/null
 
 }
 
 cursor_home() {
 
-	tput home 2>/dev/null
+        tput home 2>/dev/null
 
 }
 
 cursor_move() {
 
-	local row="$1"
-	local column="$2"
+        local row="$1"
+        local column="$2"
 
-	tput cup "$row" "$column" 2>/dev/null
+        tput cup "$row" "$column" 2>/dev/null
 
 }
 
@@ -93,19 +93,19 @@ cursor_move() {
 
 clear_line() {
 
-	printf "\r\033[K"
+        printf "\r\033[K"
 
 }
 
 clear_screen_from_cursor() {
 
-	printf "\033[J"
+        printf "\033[J"
 
 }
 
 clear_screen_to_cursor() {
 
-	printf "\033[1J"
+        printf "\033[1J"
 
 }
 
@@ -115,33 +115,33 @@ clear_screen_to_cursor() {
 
 move_up() {
 
-	local lines="${1:-1}"
+        local lines="${1:-1}"
 
-	tput cuu "$lines"
+        tput cuu "$lines"
 
 }
 
 move_down() {
 
-	local lines="${1:-1}"
+        local lines="${1:-1}"
 
-	tput cud "$lines"
+        tput cud "$lines"
 
 }
 
 move_left() {
 
-	local columns="${1:-1}"
+        local columns="${1:-1}"
 
-	tput cub "$columns"
+        tput cub "$columns"
 
 }
 
 move_right() {
 
-	local columns="${1:-1}"
+        local columns="${1:-1}"
 
-	tput cuf "$columns"
+        tput cuf "$columns"
 
 }
 
@@ -151,9 +151,9 @@ move_right() {
 
 set_terminal_title() {
 
-	local title="$1"
+        local title="$1"
 
-	printf "\033]0;%s\007" "$title"
+        printf "\033]0;%s\007" "$title"
 
 }
 
@@ -163,7 +163,7 @@ set_terminal_title() {
 
 terminal_beep() {
 
-	printf "\a"
+        printf "\a"
 
 }
 
@@ -173,13 +173,13 @@ terminal_beep() {
 
 enter_alternate_screen() {
 
-	tput smcup 2>/dev/null
+        tput smcup 2>/dev/null
 
 }
 
 leave_alternate_screen() {
 
-	tput rmcup 2>/dev/null
+        tput rmcup 2>/dev/null
 
 }
 
@@ -189,25 +189,25 @@ leave_alternate_screen() {
 
 is_interactive_terminal() {
 
-	[[ -t 1 ]]
+        [[ -t 1 ]]
 
 }
 
 supports_unicode() {
 
-	[[ "${LANG:-}" =~ UTF-8|utf8 ]]
+        [[ "${LANG:-}" =~ UTF-8|utf8 ]]
 
 }
 
 supports_truecolor() {
 
-	[[ "${COLORTERM:-}" == "truecolor" ]]
+        [[ "${COLORTERM:-}" == "truecolor" ]]
 
 }
 
 supports_mouse() {
 
-	[[ -n "${TERM:-}" ]]
+        [[ -n "${TERM:-}" ]]
 
 }
 
@@ -217,9 +217,9 @@ supports_mouse() {
 
 restore_terminal() {
 
-	cursor_show
+        cursor_show
 
-	leave_alternate_screen
+        leave_alternate_screen
 
 }
 
@@ -229,17 +229,19 @@ restore_terminal() {
 
 initialize_terminal() {
 
-	[[ "${TERMINAL_INITIALIZED:-false}" == true ]] && return 0
+        [[ "${TERMINAL_INITIALIZED:-false}" == true ]] && return 0
 
-	[[ -n "${BATS_VERSION:-}" ]] && {
-		TERMINAL_INITIALIZED=true
-		return 0
-	}
+        [[ -n "${BATS_VERSION:-}" ]] && {
+                TERMINAL_INITIALIZED=true
+                return 0
+        }
 
-	trap restore_terminal EXIT
+        # restore_terminal is invoked by errors.sh's run_exit_handlers (EXIT
+        # trap). Setting an EXIT trap here would clobber that dispatcher and
+        # drop temp-dir cleanup.
 
-	TERMINAL_INITIALIZED=true
+        TERMINAL_INITIALIZED=true
 
-	export TERMINAL_INITIALIZED
+        export TERMINAL_INITIALIZED
 
 }

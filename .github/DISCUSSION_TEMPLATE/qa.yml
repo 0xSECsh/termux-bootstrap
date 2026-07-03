@@ -1,0 +1,35 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Q&A
+
+        Ask questions about using Termux Bootstrap.
+        Before posting, check the [FAQ](https://github.com/0xSECsh/termux-bootstrap/blob/main/FAQ.md).
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What do you need help with?
+      placeholder: "How do I...?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What are you trying to achieve?
+      placeholder: "I'm trying to set up..."
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Version and device info
+      placeholder: "v0.1.0, Android 14"
+    validations:
+      required: false

@@ -23,9 +23,9 @@ readonly PROFILE_DIR
 
 show_usage() {
 
-	show_help_header
+        show_help_header
 
-	cat <<EOF
+        cat <<EOF
 Options:
 
   --help                 Show this help message
@@ -48,39 +48,39 @@ EOF
 
 list_profiles() {
 
-	local profiles
+        local profiles
 
-	if ! directory_exists "$PROFILE_DIR"; then
+        if ! directory_exists "$PROFILE_DIR"; then
 
-		log_error "Profile directory not found: ${PROFILE_DIR}"
+                log_error "Profile directory not found: ${PROFILE_DIR}"
 
-		return 1
+                return 1
 
-	fi
+        fi
 
-	profiles=("$PROFILE_DIR"/*.sh)
+        profiles=("$PROFILE_DIR"/*.sh)
 
-	if [[ ${#profiles[@]} -eq 0 ]] || [[ ! -f "${profiles[0]}" ]]; then
+        if [[ ${#profiles[@]} -eq 0 ]] || [[ ! -f "${profiles[0]}" ]]; then
 
-		log_info "No profiles available."
+                log_info "No profiles available."
 
-		return 0
+                return 0
 
-	fi
+        fi
 
-	ui_section "Available Profiles"
+        ui_section "Available Profiles"
 
-	local profile
+        local profile
 
-	for profile in "${profiles[@]}"; do
+        for profile in "${profiles[@]}"; do
 
-		profile="$(basename "$profile" .sh)"
+                profile="$(basename "$profile" .sh)"
 
-		ui_bullet "$profile"
+                ui_bullet "$profile"
 
-	done
+        done
 
-	printf "\n"
+        printf "\n"
 
 }
 
@@ -90,89 +90,89 @@ list_profiles() {
 
 _run_check() {
 
-	local label="$1"
+        local label="$1"
 
-	local func="$2"
+        local func="$2"
 
-	if $func; then
+        if $func; then
 
-		ui_success "$label"
+                ui_success "$label"
 
-	else
+        else
 
-		ui_error "$label"
+                ui_error "$label"
 
-	fi
+        fi
 
 }
 
 _run_capability() {
 
-	local label="$1"
+        local label="$1"
 
-	if has "$label"; then
+        if has "$label"; then
 
-		ui_success "${label}"
+                ui_success "${label}"
 
-	else
+        else
 
-		ui_warning "${label}"
+                ui_warning "${label}"
 
-	fi
+        fi
 
 }
 
 run_doctor() {
 
-	show_banner
+        show_banner
 
-	ui_section "System Information"
+        ui_section "System Information"
 
-	system_summary
+        system_summary
 
-	ui_section "Health Checks"
+        ui_section "Health Checks"
 
-	_run_check "Termux environment" is_termux
+        _run_check "Termux environment" is_termux
 
-	_run_check "Internet connectivity" check_internet
+        _run_check "Internet connectivity" check_internet
 
-	ui_separator
+        ui_separator
 
-	local checks=(
+        local checks=(
 
-		pkg git curl wget
+                pkg git curl wget
 
-		python node
+                python node
 
-		bash zsh
+                bash zsh
 
-		micro nano vim nvim
+                micro nano vim nvim
 
-		jq tmux fastfetch tree
+                jq tmux fastfetch tree
 
-	)
+        )
 
-	local check
+        local check
 
-	for check in "${checks[@]}"; do
+        for check in "${checks[@]}"; do
 
-		_run_capability "$check"
+                _run_capability "$check"
 
-	done
+        done
 
-	ui_separator
+        ui_separator
 
-	local storage_avail
+        local storage_avail
 
-	storage_avail="$(get_storage_available)"
+        storage_avail="$(get_storage_available)"
 
-	ui_key_value "Storage available" "$storage_avail"
+        ui_key_value "Storage available" "$storage_avail"
 
-	ui_key_value "Termux version" "$(get_termux_version)"
+        ui_key_value "Termux version" "$(get_termux_version)"
 
-	ui_key_value "Android SDK" "$(get_android_sdk)"
+        ui_key_value "Android SDK" "$(get_android_sdk)"
 
-	printf "\n"
+        printf "\n"
 
 }
 
@@ -182,40 +182,40 @@ run_doctor() {
 
 load_module() {
 
-	local category="$1"
+        local category="$1"
 
-	local module="$2"
+        local module="$2"
 
-	local module_file="${PACKAGES_DIR}/${category}/${module}.sh"
+        local module_file="${PACKAGES_DIR}/${category}/${module}.sh"
 
-	if [[ ! -f "$module_file" ]]; then
+        if [[ ! -f "$module_file" ]]; then
 
-		log_warning "Module not found: ${category}/${module}"
+                log_warning "Module not found: ${category}/${module}"
 
-		return 1
+                return 1
 
-	fi
+        fi
 
-	# shellcheck disable=SC1090
-	source "$module_file"
+        # shellcheck disable=SC1090
+        source "$module_file"
 
-	local sanitized
+        local sanitized
 
-	sanitized="${module//-/_}"
+        sanitized="${module//-/_}"
 
-	local func_name="install_${category}_${sanitized}"
+        local func_name="install_${category}_${sanitized}"
 
-	if ! declare -F "$func_name" >/dev/null 2>&1; then
+        if ! declare -F "$func_name" >/dev/null 2>&1; then
 
-		log_warning "Module '${category}/${module}' has no install function"
+                log_warning "Module '${category}/${module}' has no install function"
 
-		return 0
+                return 0
 
-	fi
+        fi
 
-	ui_section "Module: ${category}/${module}"
+        ui_section "Module: ${category}/${module}"
 
-	"$func_name"
+        "$func_name"
 
 }
 
@@ -225,82 +225,82 @@ load_module() {
 
 _available_profiles() {
 
-	local profiles=()
+        local profiles=()
 
-	local file
+        local file
 
-	if ! directory_exists "$PROFILE_DIR"; then
+        if ! directory_exists "$PROFILE_DIR"; then
 
-		printf "%s\n" "${profiles[@]}"
+                printf "%s\n" "${profiles[@]}"
 
-		return
+                return
 
-	fi
+        fi
 
-	for file in "$PROFILE_DIR"/*.sh; do
+        for file in "$PROFILE_DIR"/*.sh; do
 
-		[[ -f "$file" ]] || continue
+                [[ -f "$file" ]] || continue
 
-		profiles+=("$(basename "$file" .sh)")
+                profiles+=("$(basename "$file" .sh)")
 
-	done
+        done
 
-	printf "%s\n" "${profiles[@]}"
+        printf "%s\n" "${profiles[@]}"
 
 }
 
 _install_profile() {
 
-	local name="$1"
+        local name="$1"
 
-	local profile_file="${PROFILE_DIR}/${name}.sh"
+        local profile_file="${PROFILE_DIR}/${name}.sh"
 
-	local func_name="install_profile_${name}"
+        local func_name="install_profile_${name}"
 
-	if [[ ! -f "$profile_file" ]]; then
+        if [[ ! -f "$profile_file" ]]; then
 
-		log_error "Profile not found: ${name}"
+                log_error "Profile not found: ${name}"
 
-		return 1
+                return 1
 
-	fi
+        fi
 
-	# shellcheck disable=SC1090
-	source "$profile_file"
+        # shellcheck disable=SC1090
+        source "$profile_file"
 
-	if ! declare -F "$func_name" >/dev/null 2>&1; then
+        if ! declare -F "$func_name" >/dev/null 2>&1; then
 
-		log_warning "Profile '${name}' has no install function yet"
+                log_warning "Profile '${name}' has no install function yet"
 
-		return 0
+                return 0
 
-	fi
+        fi
 
-	ui_section "Installing: ${name}"
+        ui_section "Installing: ${name}"
 
-	"$func_name"
+        "$func_name"
 
 }
 
 install_profile() {
 
-	local name="$1"
+        local name="$1"
 
-	if [[ -z "$name" ]]; then
+        if [[ -z "$name" ]]; then
 
-		log_error "No profile specified."
+                log_error "No profile specified."
 
-		return 1
+                return 1
 
-	fi
+        fi
 
-	_install_profile "$name"
+        _install_profile "$name"
 
 }
 
 install_all_profiles() {
 
-	_install_profile full
+        _install_profile full
 
 }
 
@@ -310,130 +310,130 @@ install_all_profiles() {
 
 parse_cli() {
 
-	local action=""
-	local action_arg=""
+        local action=""
+        local action_arg=""
 
-	if [[ $# -eq 0 ]]; then
+        if [[ $# -eq 0 ]]; then
 
-		show_usage
+                show_usage
 
-		return 0
+                return 0
 
-	fi
+        fi
 
-	while [[ $# -gt 0 ]]; do
+        while [[ $# -gt 0 ]]; do
 
-		case "$1" in
+                case "$1" in
 
-		--help)
+                        --help)
 
-			show_usage
+                                show_usage
 
-			return 0
-			;;
+                                return 0
+                                ;;
 
-		--version)
+                        --version)
 
-			show_version
+                                show_version
 
-			return 0
-			;;
+                                return 0
+                                ;;
 
-		--about)
+                        --about)
 
-			show_about
+                                show_about
 
-			return 0
-			;;
+                                return 0
+                                ;;
 
-		--doctor)
+                        --doctor)
 
-			action="doctor"
-			;;
+                                action="doctor"
+                                ;;
 
-		--list)
+                        --list)
 
-			action="list"
-			;;
+                                action="list"
+                                ;;
 
-		--all)
+                        --all)
 
-			action="all"
-			;;
+                                action="all"
+                                ;;
 
-		--profile)
+                        --profile)
 
-			shift
+                                shift
 
-			if [[ $# -eq 0 ]] || [[ "$1" == --* ]]; then
+                                if [[ $# -eq 0 ]] || [[ "$1" == --* ]]; then
 
-				log_error "Missing profile name after --profile."
+                                        log_error "Missing profile name after --profile."
 
-				return "$EXIT_INVALID_ARGUMENT"
+                                        return "$EXIT_INVALID_ARGUMENT"
 
-			fi
+                                fi
 
-			action="profile"
-			action_arg="$1"
-			;;
+                                action="profile"
+                                action_arg="$1"
+                                ;;
 
-		--verbose | --debug)
+                        --verbose | --debug)
 
-			# shellcheck disable=SC2034
-			LOG_LEVEL="DEBUG"
-			;;
+                                # shellcheck disable=SC2034
+                                LOG_LEVEL="DEBUG"
+                                ;;
 
-		--*)
+                        --*)
 
-			log_error "Unknown option: $1"
+                                log_error "Unknown option: $1"
 
-			show_usage
+                                show_usage
 
-			return "$EXIT_INVALID_ARGUMENT"
-			;;
+                                return "$EXIT_INVALID_ARGUMENT"
+                                ;;
 
-		*)
+                        *)
 
-			log_error "Unexpected argument: $1"
+                                log_error "Unexpected argument: $1"
 
-			show_usage
+                                show_usage
 
-			return "$EXIT_INVALID_ARGUMENT"
-			;;
+                                return "$EXIT_INVALID_ARGUMENT"
+                                ;;
 
-		esac
+                esac
 
-		shift
+                shift
 
-	done
+        done
 
-	case "$action" in
+        case "$action" in
 
-	doctor)
+                doctor)
 
-		run_doctor
-		;;
+                        run_doctor
+                        ;;
 
-	list)
+                list)
 
-		list_profiles
-		;;
+                        list_profiles
+                        ;;
 
-	all)
+                all)
 
-		install_all_profiles
-		;;
+                        install_all_profiles
+                        ;;
 
-	profile)
+                profile)
 
-		install_profile "$action_arg"
-		;;
+                        install_profile "$action_arg"
+                        ;;
 
-	*)
+                *)
 
-		show_usage
-		;;
+                        show_usage
+                        ;;
 
-	esac
+        esac
 
 }

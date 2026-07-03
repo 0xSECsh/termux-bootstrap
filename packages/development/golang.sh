@@ -8,7 +8,7 @@
 
 install_development_golang() {
 
-	pkg_install_many \
-		golang
+        pkg_install_many \
+                golang
 
 }

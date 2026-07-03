@@ -18,40 +18,40 @@ readonly PROGRESS_WIDTH=40
 
 _progress_percentage() {
 
-	local current="$1"
-	local total="$2"
+        local current="$1"
+        local total="$2"
 
-	((total == 0)) && total=1
+        ((total == 0)) && total=1
 
-	printf "%s\n" "$((current * 100 / total))"
+        printf "%s\n" "$((current * 100 / total))"
 
 }
 
 _progress_filled() {
 
-	local current="$1"
-	local total="$2"
+        local current="$1"
+        local total="$2"
 
-	((total == 0)) && total=1
+        ((total == 0)) && total=1
 
-	printf "%s\n" "$((current * PROGRESS_WIDTH / total))"
+        printf "%s\n" "$((current * PROGRESS_WIDTH / total))"
 
 }
 
 _progress_empty() {
 
-	local filled="$1"
+        local filled="$1"
 
-	printf "%s\n" "$((PROGRESS_WIDTH - filled))"
+        printf "%s\n" "$((PROGRESS_WIDTH - filled))"
 
 }
 
 _repeat() {
 
-	local char="$1"
-	local count="$2"
+        local char="$1"
+        local count="$2"
 
-	printf "%${count}s" "" | tr ' ' "$char"
+        printf "%${count}s" "" | tr ' ' "$char"
 
 }
 
@@ -61,35 +61,35 @@ _repeat() {
 
 progress_draw() {
 
-	local current="$1"
-	local total="$2"
-	local message="${3:-}"
+        local current="$1"
+        local total="$2"
+        local message="${3:-}"
 
-	local percent
-	local filled
-	local empty
+        local percent
+        local filled
+        local empty
 
-	percent="$(_progress_percentage "$current" "$total")"
+        percent="$(_progress_percentage "$current" "$total")"
 
-	filled="$(_progress_filled "$current" "$total")"
+        filled="$(_progress_filled "$current" "$total")"
 
-	empty="$(_progress_empty "$filled")"
+        empty="$(_progress_empty "$filled")"
 
-	printf "\r"
+        printf "\r"
 
-	printf "["
+        printf "["
 
-	_repeat "█" "$filled"
+        _repeat "█" "$filled"
 
-	_repeat "░" "$empty"
+        _repeat "░" "$empty"
 
-	printf "] %3d%%" "$percent"
+        printf "] %3d%%" "$percent"
 
-	if [[ -n "$message" ]]; then
+        if [[ -n "$message" ]]; then
 
-		printf " %s" "$message"
+                printf " %s" "$message"
 
-	fi
+        fi
 
 }
 
@@ -99,7 +99,7 @@ progress_draw() {
 
 progress_finish() {
 
-	echo
+        echo
 
 }
 
@@ -109,24 +109,24 @@ progress_finish() {
 
 progress_run() {
 
-	local total="$1"
+        local total="$1"
 
-	shift
+        shift
 
-	local current=0
+        local current=0
 
-	local task
+        local task
 
-	for task in "$@"; do
+        for task in "$@"; do
 
-		((current++))
+                ((current++))
 
-		progress_draw "$current" "$total" "$task"
+                progress_draw "$current" "$total" "$task"
 
-		sleep 0.2
+                sleep 0.2
 
-	done
+        done
 
-	progress_finish
+        progress_finish
 
 }

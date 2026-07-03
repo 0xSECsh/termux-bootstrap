@@ -1,0 +1,279 @@
+# ==============================================================================
+# CI Pipeline — reusable workflow
+# ==============================================================================
+# Called by ci.yml (push), pr.yml (pull_request), nightly.yml (schedule).
+#
+# Pipeline order:
+#   Checkout → Setup → Dependencies → Formatting → Lint → Syntax →
+#   Unit tests → Integration tests → Coverage → Summary
+# ==============================================================================
+
+name: CI Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      bash-version:
+        description: "Bash version label for matrix display"
+        required: false
+        type: string
+        default: "system"
+      ref:
+        description: "Git ref to check out"
+        required: false
+        type: string
+        default: ""
+
+env:
+  FORMAT: "tap"
+
+jobs:
+  lint:
+    name: Lint and Format
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+
+      - name: Install shfmt
+        run: |
+          curl -sSLO "https://github.com/mvdan/sh/releases/download/v3.10.0/shfmt_v3.10.0_linux_amd64"
+          chmod +x shfmt_v3.10.0_linux_amd64
+          sudo mv shfmt_v3.10.0_linux_amd64 /usr/local/bin/shfmt
+
+      - name: Shell Syntax Validation
+        run: |
+          failed=0
+          while IFS= read -r -d '' f; do
+            if ! bash -n "$f" 2>&1; then
+              echo "::error file=$f::Syntax error in $f"
+              failed=$((failed + 1))
+            fi
+          done < <(find . -name '*.sh' -not -path './.git/*' -not -path './node_modules/*' -not -path './target/*' -type f -print0)
+          exit "$failed"
+
+      - name: ShellCheck
+        run: |
+          failed=0
+          while IFS= read -r -d '' f; do
+            if ! shellcheck -x -s bash "$f" 2>&1; then
+              echo "::error file=$f::ShellCheck failed on $f"
+              failed=$((failed + 1))
+            fi
+          done < <(find . -name '*.sh' -not -path './.git/*' -not -path './node_modules/*' -not -path './target/*' -type f -print0)
+          exit "$failed"
+
+      - name: shfmt Format Check
+        run: |
+          failed=0
+          while IFS= read -r -d '' f; do
+            if ! shfmt -d -i 8 -ci "$f" 2>&1; then
+              echo "::error file=$f::Formatting incorrect in $f (run: shfmt -w -i 8 -ci $f)"
+              failed=$((failed + 1))
+            fi
+          done < <(find . -name '*.sh' -not -path './.git/*' -not -path './node_modules/*' -not -path './target/*' -type f -print0)
+          exit "$failed"
+
+  test:
+    name: Tests (${{ inputs.bash-version }})
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            jq \
+            tar \
+            gzip \
+            xz-utils \
+            zip \
+            unzip
+
+      - name: Install BATS
+        run: sudo npm install -g bats
+
+      - name: Verify BATS
+        run: bats --version
+
+      - name: Run Unit Tests
+        id: unit
+        continue-on-error: false
+        run: |
+          bats --formatter tap \
+            tests/framework/ \
+            tests/utils/ \
+            tests/cli/ \
+            tests/config/ \
+            tests/logging/ \
+            tests/modules/ \
+            tests/profiles/ \
+            tests/regression/ \
+            tests/system/ \
+            tests/terminal/ \
+            tests/validation/
+
+      - name: Run Integration Tests
+        id: integration
+        continue-on-error: false
+        run: |
+          bats --formatter tap tests/integration/
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          {
+            echo "## Test Results"
+            echo ""
+            echo "| Suite | Result |"
+            echo "|-------|--------|"
+            if [[ "${{ steps.unit.outcome }}" == "success" ]]; then
+              echo "| Unit Tests | ✅ Passed |"
+            else
+              echo "| Unit Tests | ❌ Failed |"
+            fi
+            if [[ "${{ steps.integration.outcome }}" == "success" ]]; then
+              echo "| Integration Tests | ✅ Passed |"
+            else
+              echo "| Integration Tests | ❌ Failed |"
+            fi
+            echo ""
+            echo "### Runtime"
+            echo "- **Bash:** $(bash --version | head -1)"
+            echo "- **BATS:** $(bats --version 2>/dev/null || echo 'unknown')"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload BATS reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ inputs.bash-version }}
+          path: |
+            test-reports/
+            /tmp/bats-test-*.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Install kcov
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libcurl4-openssl-dev \
+            libelf-dev \
+            libdw-dev \
+            binutils-dev \
+            cmake \
+            g++ \
+            pkg-config \
+            jq
+
+      - name: Build kcov
+        run: |
+          git clone --depth 1 --branch v43 https://github.com/SimonKagstrom/kcov /tmp/kcov-src
+          mkdir /tmp/kcov-build
+          cd /tmp/kcov-build
+          cmake /tmp/kcov-src
+          make -j"$(nproc)"
+          sudo make install
+
+      - name: Install BATS
+        run: sudo npm install -g bats
+
+      - name: Measure coverage
+        run: |
+          mkdir -p coverage-output
+          for dir in tests/framework tests/utils tests/cli tests/config tests/logging tests/modules tests/profiles tests/regression tests/system tests/terminal tests/validation tests/integration; do
+            if [ -d "$dir" ]; then
+              kcov \
+                --include-path="$(pwd)/lib,$(pwd)/modules,$(pwd)/commands" \
+                --exclude-pattern=/.cargo,/usr/lib,.bats,node_modules \
+                coverage-output \
+                bats "$dir" 2>/dev/null || true
+            fi
+          done
+
+      - name: Generate coverage summary
+        run: |
+          if [ -d coverage-output ]; then
+            total=0
+            covered=0
+            while IFS= read -r line; do
+              if echo "$line" | grep -q '"totalLines"'; then
+                t=$(echo "$line" | grep -oP '\d+')
+                total=$((total + t))
+              fi
+              if echo "$line" | grep -q '"coveredLines"'; then
+                c=$(echo "$line" | grep -oP '\d+')
+                covered=$((covered + c))
+              fi
+            done < <(find coverage-output -name 'coverage.json' -exec cat {} + 2>/dev/null)
+            if [ "$total" -gt 0 ]; then
+              pct=$(echo "scale=1; 100 * $covered / $total" | bc)
+              echo "## Coverage Summary" >> "${GITHUB_STEP_SUMMARY}"
+              echo "" >> "${GITHUB_STEP_SUMMARY}"
+              echo "- **Total lines:** $total" >> "${GITHUB_STEP_SUMMARY}"
+              echo "- **Covered lines:** $covered" >> "${GITHUB_STEP_SUMMARY}"
+              echo "- **Coverage:** ${pct}%" >> "${GITHUB_STEP_SUMMARY}"
+              echo "" >> "${GITHUB_STEP_SUMMARY}"
+              if [ "$(echo "$pct < 50" | bc)" -eq 1 ]; then
+                echo "::warning title=Coverage below 50%::Coverage is ${pct}%"
+              fi
+            else
+              echo "Coverage data not available" >> "${GITHUB_STEP_SUMMARY}"
+            fi
+          else
+            echo "Coverage directory not found" >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: coverage-output/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  summary:
+    name: Pipeline Summary
+    if: always()
+    needs: [lint, test, coverage]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Collect results
+        run: |
+          {
+            echo "## Pipeline Summary"
+            echo ""
+            echo "| Job | Status |"
+            echo "|-----|--------|"
+            echo "| Lint | ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed' }} |"
+            echo "| Test | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |"
+            echo "| Coverage | ${{ needs.coverage.result == 'success' && '✅ Passed' || '❌ Failed' }} |"
+            echo ""
+            if [[ "${{ needs.lint.result }}" == "success" && "${{ needs.test.result }}" == "success" ]]; then
+              echo "**All checks passed.**"
+            else
+              echo "**Some checks failed. Review the logs above.**"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"

@@ -8,11 +8,11 @@
 
 install_cybersecurity_osint() {
 
-	pkg_install_many \
-		recon-ng \
-		sherlock \
-		holehe \
-		maigret \
-		photon
+        pkg_install_many \
+                recon-ng \
+                sherlock \
+                holehe \
+                maigret \
+                photon
 
 }

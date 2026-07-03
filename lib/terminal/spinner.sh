@@ -27,22 +27,22 @@ SPINNER_DELAY=0.08
 
 _spinner() {
 
-	local message="$1"
-	local frame=0
+        local message="$1"
+        local frame=0
 
-	cursor_hide
+        cursor_hide
 
-	while true; do
+        while true; do
 
-		printf "\r%s %s" \
-			"${SPINNER_FRAMES[$frame]}" \
-			"$message"
+                printf "\r%s %s" \
+                        "${SPINNER_FRAMES[$frame]}" \
+                        "$message"
 
-		frame=$(((frame + 1) % ${#SPINNER_FRAMES[@]}))
+                frame=$(((frame + 1) % ${#SPINNER_FRAMES[@]}))
 
-		sleep "$SPINNER_DELAY"
+                sleep "$SPINNER_DELAY"
 
-	done
+        done
 
 }
 
@@ -52,13 +52,13 @@ _spinner() {
 
 spinner_start() {
 
-	[[ -z "$SPINNER_PID" ]] || return 0
+        [[ -z "$SPINNER_PID" ]] || return 0
 
-	local message="${1:-Working...}"
+        local message="${1:-Working...}"
 
-	_spinner "$message" &
+        _spinner "$message" &
 
-	SPINNER_PID=$!
+        SPINNER_PID=$!
 
 }
 
@@ -68,19 +68,19 @@ spinner_start() {
 
 spinner_stop() {
 
-	if [[ -n "$SPINNER_PID" ]]; then
+        if [[ -n "$SPINNER_PID" ]]; then
 
-		kill "$SPINNER_PID" >/dev/null 2>&1 || true
+                kill "$SPINNER_PID" >/dev/null 2>&1 || true
 
-		wait "$SPINNER_PID" 2>/dev/null || true
+                wait "$SPINNER_PID" 2>/dev/null || true
 
-		SPINNER_PID=""
+                SPINNER_PID=""
 
-		clear_line
+                clear_line
 
-		cursor_show
+                cursor_show
 
-	fi
+        fi
 
 }
 
@@ -90,11 +90,11 @@ spinner_stop() {
 
 spinner_success() {
 
-	local message="${1:-Done}"
+        local message="${1:-Done}"
 
-	spinner_stop
+        spinner_stop
 
-	colorize "$GREEN" "✔ ${message}"
+        colorize "$GREEN" "✔ ${message}"
 
 }
 
@@ -104,11 +104,11 @@ spinner_success() {
 
 spinner_warning() {
 
-	local message="${1:-Warning}"
+        local message="${1:-Warning}"
 
-	spinner_stop
+        spinner_stop
 
-	colorize "$YELLOW" "⚠ ${message}"
+        colorize "$YELLOW" "⚠ ${message}"
 
 }
 
@@ -118,11 +118,11 @@ spinner_warning() {
 
 spinner_error() {
 
-	local message="${1:-Failed}"
+        local message="${1:-Failed}"
 
-	spinner_stop
+        spinner_stop
 
-	colorize "$RED" "✖ ${message}"
+        colorize "$RED" "✖ ${message}"
 
 }
 
@@ -132,11 +132,11 @@ spinner_error() {
 
 spinner_info() {
 
-	local message="${1:-Info}"
+        local message="${1:-Info}"
 
-	spinner_stop
+        spinner_stop
 
-	colorize "$BLUE" "➜ ${message}"
+        colorize "$BLUE" "➜ ${message}"
 
 }
 
@@ -146,26 +146,26 @@ spinner_info() {
 
 spinner_run() {
 
-	local message="$1"
+        local message="$1"
 
-	shift
+        shift
 
-	spinner_start "$message"
+        spinner_start "$message"
 
-	"$@"
+        "$@"
 
-	local status=$?
+        local status=$?
 
-	if [[ $status -eq 0 ]]; then
+        if [[ $status -eq 0 ]]; then
 
-		spinner_success "$message"
+                spinner_success "$message"
 
-	else
+        else
 
-		spinner_error "$message"
+                spinner_error "$message"
 
-	fi
+        fi
 
-	return "$status"
+        return "$status"
 
 }

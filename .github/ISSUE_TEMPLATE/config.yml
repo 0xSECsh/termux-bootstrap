@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Termux Bootstrap Documentation
+    url: https://github.com/0xSECsh/termux-bootstrap#readme
+    about: Consult the documentation before opening an issue
+  - name: Frequently Asked Questions
+    url: https://github.com/0xSECsh/termux-bootstrap/blob/main/FAQ.md
+    about: Check the FAQ for common questions
+  - name: GitHub Discussions
+    url: https://github.com/0xSECsh/termux-bootstrap/discussions
+    about: Ask questions and share ideas in Discussions

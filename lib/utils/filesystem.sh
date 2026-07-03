@@ -1,57 +1,59 @@
 #!/usr/bin/env bash
 #
 # ==============================================================================
-# Filesystem Helpers
+# Termux Bootstrap
+# File: utils/filesystem.sh
+# Description: Filesystem operations — create, copy, move, remove, size queries
 # ==============================================================================
 
 create_directory() {
-	mkdir -p -- "$1"
+        mkdir -p -- "$1"
 }
 
 remove_directory() {
-	local directory="$1"
+        local directory="$1"
 
-	[[ -n "$directory" && "$directory" != "/" ]] || return 1
+        [[ -n "$directory" && "$directory" != "/" ]] || return 1
 
-	rm -rf -- "$directory"
+        rm -rf -- "$directory"
 }
 
 create_file() {
-	mkdir -p -- "$(dirname "$1")"
+        mkdir -p -- "$(dirname "$1")"
 
-	touch -- "$1"
+        touch -- "$1"
 }
 
 copy_file() {
-	cp -- "$1" "$2"
+        cp -- "$1" "$2"
 }
 
 move_file() {
-	mv -- "$1" "$2"
+        mv -- "$1" "$2"
 }
 
 backup_file() {
 
-	local file="$1"
+        local file="$1"
 
-	[[ -f "$file" ]] || return 0
+        [[ -f "$file" ]] || return 0
 
-	cp -- "$file" "${file}.bak"
+        cp -- "$file" "${file}.bak"
 
 }
 
 file_size() {
 
-	local result
+        local result
 
-	result="$(stat -c%s "$1" 2>/dev/null)" || result="$(stat -f%z "$1" 2>/dev/null)"
+        result="$(stat -c%s "$1" 2>/dev/null)" || result="$(stat -f%z "$1" 2>/dev/null)"
 
-	printf "%s\n" "$result"
+        printf "%s\n" "$result"
 
 }
 
 directory_size() {
 
-	du -sh -- "$1"
+        du -sh -- "$1"
 
 }

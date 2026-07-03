@@ -8,9 +8,9 @@
 
 install_cybersecurity_mobile() {
 
-	pkg_install_many \
-		apktool \
-		jadx \
-		dex2jar
+        pkg_install_many \
+                apktool \
+                jadx \
+                dex2jar
 
 }

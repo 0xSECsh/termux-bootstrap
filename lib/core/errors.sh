@@ -22,13 +22,13 @@ readonly EXIT_PERMISSION="${EXIT_PERMISSION_ERROR:-5}"
 readonly EXIT_INTERRUPTED=130
 
 export \
-	EXIT_OK \
-	EXIT_ERROR \
-	EXIT_ARGUMENT \
-	EXIT_DEPENDENCY \
-	EXIT_NETWORK \
-	EXIT_PERMISSION \
-	EXIT_INTERRUPTED
+        EXIT_OK \
+        EXIT_ERROR \
+        EXIT_ARGUMENT \
+        EXIT_DEPENDENCY \
+        EXIT_NETWORK \
+        EXIT_PERMISSION \
+        EXIT_INTERRUPTED
 
 # ------------------------------------------------------------------------------
 # Internal Helpers
@@ -36,16 +36,16 @@ export \
 
 _stacktrace() {
 
-	local frame=0
-	local max_frames=100
+        local frame=0
+        local max_frames=100
 
-	echo
+        echo
 
-	log_error "Stack trace:"
+        log_error "Stack trace:"
 
-	while [[ $frame -lt $max_frames ]] && caller "$frame"; do
-		((frame++))
-	done
+        while [[ $frame -lt $max_frames ]] && caller "$frame"; do
+                ((frame++))
+        done
 
 }
 
@@ -55,47 +55,47 @@ _stacktrace() {
 
 die() {
 
-	local message="$1"
+        local message="$1"
 
-	log_error "$message"
+        log_error "$message"
 
-	exit "$EXIT_ERROR"
+        exit "$EXIT_ERROR"
 
 }
 
 panic() {
 
-	local message="$1"
+        local message="$1"
 
-	log_error "PANIC: ${message}"
+        log_error "PANIC: ${message}"
 
-	_stacktrace
+        _stacktrace
 
-	exit "$EXIT_ERROR"
+        exit "$EXIT_ERROR"
 
 }
 
 warn() {
 
-	log_warning "$1"
+        log_warning "$1"
 
 }
 
 success() {
 
-	log_success "$1"
+        log_success "$1"
 
 }
 
 info() {
 
-	log_info "$1"
+        log_info "$1"
 
 }
 
 debug() {
 
-	log_debug "$1"
+        log_debug "$1"
 
 }
 
@@ -105,41 +105,41 @@ debug() {
 
 assert_file() {
 
-	local file="$1"
+        local file="$1"
 
-	[[ -f "$file" ]] || die "File not found: ${file}"
+        [[ -f "$file" ]] || die "File not found: ${file}"
 
 }
 
 assert_directory() {
 
-	local directory="$1"
+        local directory="$1"
 
-	[[ -d "$directory" ]] || die "Directory not found: ${directory}"
+        [[ -d "$directory" ]] || die "Directory not found: ${directory}"
 
 }
 
 assert_command() {
 
-	local command="$1"
+        local command="$1"
 
-	command_exists "$command" || die "Command not found: ${command}"
+        command_exists "$command" || die "Command not found: ${command}"
 
 }
 
 assert_capability() {
 
-	local capability="$1"
+        local capability="$1"
 
-	has "$capability" || die "Missing capability: ${capability}"
+        has "$capability" || die "Missing capability: ${capability}"
 
 }
 
 assert_variable() {
 
-	local variable="$1"
+        local variable="$1"
 
-	[[ -n "${!variable:-}" ]] || die "Variable not set: ${variable}"
+        [[ -n "${!variable:-}" ]] || die "Variable not set: ${variable}"
 
 }
 
@@ -147,34 +147,48 @@ assert_variable() {
 # Traps
 # ------------------------------------------------------------------------------
 
+# Single EXIT dispatcher. Runs every registered cleanup hook that exists,
+# in a defined order, so per-signal traps in other modules do not clobber
+# one another (bash replaces, rather than stacks, traps per signal).
+run_exit_handlers() {
+
+        declare -F run_temp_cleanup >/dev/null 2>&1 && run_temp_cleanup
+
+        declare -F restore_terminal >/dev/null 2>&1 && restore_terminal
+
+}
+
 on_interrupt() {
 
-	warn "Execution interrupted."
+        warn "Execution interrupted."
 
-	exit "$EXIT_INTERRUPTED"
+        # Cleanup runs via the EXIT trap that this exit triggers.
+        exit "$EXIT_INTERRUPTED"
 
 }
 
 on_error() {
 
-	local exit_code="$?"
+        local exit_code="$?"
 
-	panic "Unexpected error (exit code: ${exit_code})"
+        panic "Unexpected error (exit code: ${exit_code})"
 
 }
 
 register_error_handlers() {
 
-	[[ "${ERROR_HANDLERS_REGISTERED:-false}" == true ]] && return 0
+        [[ "${ERROR_HANDLERS_REGISTERED:-false}" == true ]] && return 0
 
-	[[ -n "${BATS_VERSION:-}" ]] && return 0
+        [[ -n "${BATS_VERSION:-}" ]] && return 0
 
-	trap on_interrupt INT TERM
+        trap run_exit_handlers EXIT
 
-	trap on_error ERR
+        trap on_interrupt INT TERM
 
-	ERROR_HANDLERS_REGISTERED=true
+        trap on_error ERR
 
-	export ERROR_HANDLERS_REGISTERED
+        ERROR_HANDLERS_REGISTERED=true
+
+        export ERROR_HANDLERS_REGISTERED
 
 }

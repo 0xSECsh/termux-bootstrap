@@ -9,11 +9,11 @@
 
 install_ai_ai() {
 
-	pkg_install_many \
-		python \
-		python-pip \
-		python-numpy \
-		clblast \
-		openblas
+        pkg_install_many \
+                python \
+                python-pip \
+                python-numpy \
+                clblast \
+                openblas
 
 }

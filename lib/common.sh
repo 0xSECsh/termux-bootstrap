@@ -7,7 +7,7 @@
 # ==============================================================================
 
 if [[ "${TERMUX_BOOTSTRAP_COMMON_LOADED:-false}" == true ]]; then
-	return 0
+        return 0
 fi
 
 readonly TERMUX_BOOTSTRAP_COMMON_LOADED=true
@@ -31,25 +31,25 @@ declare -Ag LOADED_LIBRARIES=()
 
 load_library() {
 
-	local library="$1"
+        local library="$1"
 
-	if [[ -n "${LOADED_LIBRARIES[$library]:-}" ]]; then
-		return 0
-	fi
+        if [[ -n "${LOADED_LIBRARIES[$library]:-}" ]]; then
+                return 0
+        fi
 
-	if [[ ! -f "$library" ]]; then
+        if [[ ! -f "$library" ]]; then
 
-		printf "ERROR: Unable to load library:\n"
-		printf "  %s\n" "$library"
+                printf "ERROR: Unable to load library:\n"
+                printf "  %s\n" "$library"
 
-		exit 1
+                exit 1
 
-	fi
+        fi
 
-	# shellcheck disable=SC1090
-	source "$library"
+        # shellcheck disable=SC1090
+        source "$library"
 
-	LOADED_LIBRARIES["$library"]=1
+        LOADED_LIBRARIES["$library"]=1
 
 }
 
@@ -59,76 +59,76 @@ load_library() {
 
 framework_initialize() {
 
-	load_library "$LIB_DIR/core/constants.sh"
+        load_library "$LIB_DIR/core/constants.sh"
 
-	load_library "$LIB_DIR/terminal/colors.sh"
+        load_library "$LIB_DIR/terminal/colors.sh"
 
-	load_library "$LIB_DIR/terminal/terminal.sh"
+        load_library "$LIB_DIR/terminal/terminal.sh"
 
-	load_library "$LIB_DIR/terminal/logging.sh"
+        load_library "$LIB_DIR/terminal/logging.sh"
 
-	load_library "$LIB_DIR/core/errors.sh"
+        load_library "$LIB_DIR/core/errors.sh"
 
-	load_library "$LIB_DIR/utils/filesystem.sh"
+        load_library "$LIB_DIR/utils/filesystem.sh"
 
-	load_library "$LIB_DIR/utils/download.sh"
+        load_library "$LIB_DIR/utils/download.sh"
 
-	load_library "$LIB_DIR/utils/archive.sh"
+        load_library "$LIB_DIR/utils/archive.sh"
 
-	load_library "$LIB_DIR/utils/hash.sh"
+        load_library "$LIB_DIR/utils/hash.sh"
 
-	load_library "$LIB_DIR/utils/json.sh"
+        load_library "$LIB_DIR/utils/json.sh"
 
-	load_library "$LIB_DIR/utils/random.sh"
+        load_library "$LIB_DIR/utils/random.sh"
 
-	load_library "$LIB_DIR/utils/retry.sh"
+        load_library "$LIB_DIR/utils/retry.sh"
 
-	load_library "$LIB_DIR/utils/string.sh"
+        load_library "$LIB_DIR/utils/string.sh"
 
-	load_library "$LIB_DIR/utils/time.sh"
+        load_library "$LIB_DIR/utils/time.sh"
 
-	load_library "$LIB_DIR/utils/cache.sh"
+        load_library "$LIB_DIR/utils/cache.sh"
 
-	load_library "$LIB_DIR/utils/temp.sh"
+        load_library "$LIB_DIR/utils/temp.sh"
 
-	load_library "$LIB_DIR/system/system.sh"
+        load_library "$LIB_DIR/system/system.sh"
 
-	load_library "$LIB_DIR/system/validation.sh"
+        load_library "$LIB_DIR/system/validation.sh"
 
-	load_library "$LIB_DIR/system/capabilities.sh"
+        load_library "$LIB_DIR/system/capabilities.sh"
 
-	load_library "$LIB_DIR/system/packages.sh"
+        load_library "$LIB_DIR/system/packages.sh"
 
-	load_library "$LIB_DIR/../modules/module_registry.sh"
+        load_library "$LIB_DIR/../modules/module_registry.sh"
 
-	load_library "$LIB_DIR/../modules/module_loader.sh"
+        load_library "$LIB_DIR/../modules/module_loader.sh"
 
-	load_library "$LIB_DIR/../modules/profile_registry.sh"
+        load_library "$LIB_DIR/../modules/profile_registry.sh"
 
-	load_library "$LIB_DIR/../modules/profile_loader.sh"
+        load_library "$LIB_DIR/../modules/profile_loader.sh"
 
-	load_library "$LIB_DIR/../modules/config_engine.sh"
+        load_library "$LIB_DIR/../modules/config_engine.sh"
 
-	load_library "$LIB_DIR/../modules/installer_engine.sh"
+        load_library "$LIB_DIR/../modules/installer_engine.sh"
 
-	load_library "$LIB_DIR/core/environment.sh"
+        load_library "$LIB_DIR/core/environment.sh"
 
-	load_library "$LIB_DIR/core/version.sh"
+        load_library "$LIB_DIR/core/version.sh"
 
-	load_library "$LIB_DIR/terminal/progress.sh"
+        load_library "$LIB_DIR/terminal/progress.sh"
 
-	load_library "$LIB_DIR/terminal/spinner.sh"
+        load_library "$LIB_DIR/terminal/spinner.sh"
 
-	load_library "$LIB_DIR/terminal/ui.sh"
+        load_library "$LIB_DIR/terminal/ui.sh"
 
-	load_library "$LIB_DIR/core/dispatcher.sh"
+        load_library "$LIB_DIR/core/dispatcher.sh"
 
-	register_error_handlers
+        register_error_handlers
 
-	initialize_environment
+        initialize_environment
 
-	initialize_terminal
+        initialize_terminal
 
-	system_detect
+        system_detect
 
 }

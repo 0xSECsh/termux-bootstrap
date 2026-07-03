@@ -39,3 +39,7 @@ bin/
 
 # Backup files
 *.orig
+
+# CI / Test artifacts
+test-reports/
+coverage-output/

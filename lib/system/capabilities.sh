@@ -12,222 +12,222 @@
 
 has() {
 
-	local capability="${1,,}"
+        local capability="${1,,}"
 
-	case "$capability" in
+        case "$capability" in
 
-	# ------------------------------------------------------------------
-	# Environment
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Environment
+                # ------------------------------------------------------------------
 
-	termux)
+                termux)
 
-		[[ -n "${TERMUX_VERSION:-}" ]]
-		;;
+                        [[ -n "${TERMUX_VERSION:-}" ]]
+                        ;;
 
-	android)
+                android)
 
-		[[ -d "/system" ]]
-		;;
+                        [[ -d "/system" ]]
+                        ;;
 
-	root)
+                root)
 
-		[[ "$(id -u)" -eq 0 ]]
-		;;
+                        [[ "$(id -u)" -eq 0 ]]
+                        ;;
 
-	internet)
+                internet)
 
-		check_internet
-		;;
+                        check_internet
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Package Managers
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Package Managers
+                # ------------------------------------------------------------------
 
-	pkg)
+                pkg)
 
-		command_exists pkg
-		;;
+                        command_exists pkg
+                        ;;
 
-	pip)
+                pip)
 
-		command_exists pip
-		;;
+                        command_exists pip
+                        ;;
 
-	npm)
+                npm)
 
-		command_exists npm
-		;;
+                        command_exists npm
+                        ;;
 
-	cargo)
+                cargo)
 
-		command_exists cargo
-		;;
+                        command_exists cargo
+                        ;;
 
-	go)
+                go)
 
-		command_exists go
-		;;
+                        command_exists go
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Languages
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Languages
+                # ------------------------------------------------------------------
 
-	python)
+                python)
 
-		command_exists python
-		;;
+                        command_exists python
+                        ;;
 
-	node)
+                node)
 
-		command_exists node
-		;;
+                        command_exists node
+                        ;;
 
-	rust)
+                rust)
 
-		command_exists rustc
-		;;
+                        command_exists rustc
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Shells
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Shells
+                # ------------------------------------------------------------------
 
-	bash)
+                bash)
 
-		command_exists bash
-		;;
+                        command_exists bash
+                        ;;
 
-	zsh)
+                zsh)
 
-		command_exists zsh
-		;;
+                        command_exists zsh
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Editors
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Editors
+                # ------------------------------------------------------------------
 
-	micro)
+                micro)
 
-		command_exists micro
-		;;
+                        command_exists micro
+                        ;;
 
-	nano)
+                nano)
 
-		command_exists nano
-		;;
+                        command_exists nano
+                        ;;
 
-	vim)
+                vim)
 
-		command_exists vim
-		;;
+                        command_exists vim
+                        ;;
 
-	nvim | neovim)
+                nvim | neovim)
 
-		command_exists nvim
-		;;
+                        command_exists nvim
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Utilities
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Utilities
+                # ------------------------------------------------------------------
 
-	git)
+                git)
 
-		command_exists git
-		;;
+                        command_exists git
+                        ;;
 
-	curl)
+                curl)
 
-		command_exists curl
-		;;
+                        command_exists curl
+                        ;;
 
-	wget)
+                wget)
 
-		command_exists wget
-		;;
+                        command_exists wget
+                        ;;
 
-	jq)
+                jq)
 
-		command_exists jq
-		;;
+                        command_exists jq
+                        ;;
 
-	yq)
+                yq)
 
-		command_exists yq
-		;;
+                        command_exists yq
+                        ;;
 
-	tmux)
+                tmux)
 
-		command_exists tmux
-		;;
+                        command_exists tmux
+                        ;;
 
-	fastfetch)
+                fastfetch)
 
-		command_exists fastfetch
-		;;
+                        command_exists fastfetch
+                        ;;
 
-	tree)
+                tree)
 
-		command_exists tree
-		;;
+                        command_exists tree
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Cybersecurity
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Cybersecurity
+                # ------------------------------------------------------------------
 
-	nmap)
+                nmap)
 
-		command_exists nmap
-		;;
+                        command_exists nmap
+                        ;;
 
-	tcpdump)
+                tcpdump)
 
-		command_exists tcpdump
-		;;
+                        command_exists tcpdump
+                        ;;
 
-	ffmpeg)
+                ffmpeg)
 
-		command_exists ffmpeg
-		;;
+                        command_exists ffmpeg
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Termux API
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Termux API
+                # ------------------------------------------------------------------
 
-	termux-api)
+                termux-api)
 
-		command_exists termux-battery-status
-		;;
+                        command_exists termux-battery-status
+                        ;;
 
-	storage)
+                storage)
 
-		[[ -d "$HOME/storage" ]]
-		;;
+                        [[ -d "$HOME/storage" ]]
+                        ;;
 
-	# ------------------------------------------------------------------
-	# Architecture
-	# ------------------------------------------------------------------
+                # ------------------------------------------------------------------
+                # Architecture
+                # ------------------------------------------------------------------
 
-	arm64)
+                arm64)
 
-		[[ "${SYSTEM_ARCH:-$(uname -m)}" == "aarch64" ]]
-		;;
+                        [[ "${SYSTEM_ARCH:-$(uname -m)}" == "aarch64" ]]
+                        ;;
 
-	arm)
+                arm)
 
-		[[ "${SYSTEM_ARCH:-$(uname -m)}" == "arm" ]]
-		;;
+                        [[ "${SYSTEM_ARCH:-$(uname -m)}" == "arm" ]]
+                        ;;
 
-	x86_64)
+                x86_64)
 
-		[[ "${SYSTEM_ARCH:-$(uname -m)}" == "x86_64" ]]
-		;;
+                        [[ "${SYSTEM_ARCH:-$(uname -m)}" == "x86_64" ]]
+                        ;;
 
-	*)
+                *)
 
-		return 1
-		;;
+                        return 1
+                        ;;
 
-	esac
+        esac
 
 }
 
@@ -237,7 +237,7 @@ has() {
 
 missing() {
 
-	! has "$1"
+        ! has "$1"
 
 }
 
@@ -247,13 +247,13 @@ missing() {
 
 require() {
 
-	local capability="$1"
+        local capability="$1"
 
-	if ! has "$capability"; then
+        if ! has "$capability"; then
 
-		fatal "Required capability not available: ${capability}"
+                fatal "Required capability not available: ${capability}"
 
-	fi
+        fi
 
 }
 
@@ -263,6 +263,6 @@ require() {
 
 assert() {
 
-	require "$@"
+        require "$@"
 
 }

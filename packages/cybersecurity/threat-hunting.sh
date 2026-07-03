@@ -8,9 +8,9 @@
 
 install_cybersecurity_threat_hunting() {
 
-	pkg_install_many \
-		yara \
-		volatility3 \
-		capa
+        pkg_install_many \
+                yara \
+                volatility3 \
+                capa
 
 }

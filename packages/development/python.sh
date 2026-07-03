@@ -3,14 +3,13 @@
 # ==============================================================================
 # Termux Bootstrap
 # File: packages/development/python.sh
-# Description: Python development packages
-# Depends: core/base
+# Description: Python development environment
 # ==============================================================================
 
 install_development_python() {
 
-	pkg_install_many \
-		python \
-		python-pip
+        pkg_install_many \
+                python \
+                python-pip
 
 }

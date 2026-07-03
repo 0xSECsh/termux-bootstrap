@@ -1,0 +1,76 @@
+# ==============================================================================
+# CODEOWNERS — Define who owns which files
+# ==============================================================================
+# Each line is a file pattern followed by one or more owners.
+# Order matters: the last matching pattern takes precedence.
+#
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# ==============================================================================
+
+# Global default owners
+* @0xSECsh
+
+# Build and entry points
+bootstrap.sh                   @0xSECsh
+install.sh                     @0xSECsh
+uninstall.sh                   @0xSECsh
+
+# Core framework
+/lib/core/                     @0xSECsh
+/lib/common.sh                 @0xSECsh
+
+# System layer
+/lib/system/                   @0xSECsh
+
+# Terminal layer
+/lib/terminal/                 @0xSECsh
+
+# Utility layer
+/lib/utils/                    @0xSECsh
+
+# Orchestration layer
+/modules/                      @0xSECsh
+
+# Domain packages
+/packages/core/                @0xSECsh
+/packages/development/         @0xSECsh
+/packages/cybersecurity/       @0xSECsh
+/packages/ai/                  @0xSECsh
+/packages/profiles/            @0xSECsh
+
+# CLI commands
+/commands/                     @0xSECsh
+
+# Tests
+/tests/                        @0xSECsh
+
+# CI/CD
+/.github/workflows/            @0xSECsh
+/.github/ISSUE_TEMPLATE/       @0xSECsh
+/.github/PULL_REQUEST_TEMPLATE.md @0xSECsh
+
+# Configuration
+/.github/CODEOWNERS            @0xSECsh
+/.github/FUNDING.yml           @0xSECsh
+
+# Documentation
+/README.md                     @0xSECsh
+/ARCHITECTURE.md               @0xSECsh
+/INSTALL.md                    @0xSECsh
+/USAGE.md                      @0xSECsh
+/CLI.md                        @0xSECsh
+/CONTRIBUTING.md               @0xSECsh
+/CODE_OF_CONDUCT.md            @0xSECsh
+/SECURITY.md                   @0xSECsh
+/SUPPORT.md                    @0xSECsh
+/CHANGELOG.md                  @0xSECsh
+/ROADMAP.md                    @0xSECsh
+/FAQ.md                        @0xSECsh
+/LICENSE.md                    @0xSECsh
+
+# Config and scripts
+/configs/                      @0xSECsh
+/scripts/                      @0xSECsh
+
+# Project metadata
+/AGENTS.md                     @0xSECsh

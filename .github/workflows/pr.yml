@@ -1,0 +1,35 @@
+# ==============================================================================
+# PR — Pull Request Validation
+# ==============================================================================
+# Runs the full pipeline on every pull request to protect main branches.
+# Automatically cancels duplicate runs for the same PR.
+# ==============================================================================
+
+name: PR
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "assets/**"
+      - "templates/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    name: PR #${{ github.event.pull_request.number }}
+    uses: ./.github/workflows/ci-pipeline.yml
+    with:
+      bash-version: "system"

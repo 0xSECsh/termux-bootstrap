@@ -15,19 +15,19 @@
 
 get_os() {
 
-	uname -s
+        uname -s
 
 }
 
 get_kernel() {
 
-	uname -r
+        uname -r
 
 }
 
 get_architecture() {
 
-	uname -m
+        uname -m
 
 }
 
@@ -37,33 +37,33 @@ get_architecture() {
 
 get_android_version() {
 
-	command -v getprop >/dev/null 2>&1 || return 0
+        command -v getprop >/dev/null 2>&1 || return 0
 
-	getprop ro.build.version.release
+        getprop ro.build.version.release
 
 }
 
 get_android_sdk() {
 
-	command -v getprop >/dev/null 2>&1 || return 0
+        command -v getprop >/dev/null 2>&1 || return 0
 
-	getprop ro.build.version.sdk
+        getprop ro.build.version.sdk
 
 }
 
 get_device_model() {
 
-	command -v getprop >/dev/null 2>&1 || return 0
+        command -v getprop >/dev/null 2>&1 || return 0
 
-	getprop ro.product.model
+        getprop ro.product.model
 
 }
 
 get_device_manufacturer() {
 
-	command -v getprop >/dev/null 2>&1 || return 0
+        command -v getprop >/dev/null 2>&1 || return 0
 
-	getprop ro.product.manufacturer
+        getprop ro.product.manufacturer
 
 }
 
@@ -73,13 +73,13 @@ get_device_manufacturer() {
 
 get_shell() {
 
-	basename "$SHELL"
+        basename "$SHELL"
 
 }
 
 get_bash_version() {
 
-	bash --version | head -n1
+        bash --version | head -n1
 
 }
 
@@ -89,22 +89,22 @@ get_bash_version() {
 
 get_cpu() {
 
-	if [[ -r /proc/cpuinfo ]]; then
-		grep -m1 "model name" /proc/cpuinfo | cut -d':' -f2 | xargs ||
-			grep -m1 "Hardware" /proc/cpuinfo | cut -d':' -f2 | xargs
-	elif command -v sysctl >/dev/null 2>&1; then
-		sysctl -n machdep.cpu.brand_string 2>/dev/null
-	fi
+        if [[ -r /proc/cpuinfo ]]; then
+                grep -m1 "model name" /proc/cpuinfo | cut -d':' -f2 | xargs ||
+                        grep -m1 "Hardware" /proc/cpuinfo | cut -d':' -f2 | xargs
+        elif command -v sysctl >/dev/null 2>&1; then
+                sysctl -n machdep.cpu.brand_string 2>/dev/null
+        fi
 
 }
 
 get_cpu_cores() {
 
-	if command -v nproc >/dev/null 2>&1; then
-		nproc
-	else
-		getconf _NPROCESSORS_ONLN
-	fi
+        if command -v nproc >/dev/null 2>&1; then
+                nproc
+        else
+                getconf _NPROCESSORS_ONLN
+        fi
 
 }
 
@@ -114,17 +114,17 @@ get_cpu_cores() {
 
 get_memory_total() {
 
-	if [[ -r /proc/meminfo ]]; then
-		awk '/MemTotal/ { printf "%.0f MB\n", $2 / 1024 }' /proc/meminfo
-	elif command -v sysctl >/dev/null 2>&1; then
-		local memory_bytes
+        if [[ -r /proc/meminfo ]]; then
+                awk '/MemTotal/ { printf "%.0f MB\n", $2 / 1024 }' /proc/meminfo
+        elif command -v sysctl >/dev/null 2>&1; then
+                local memory_bytes
 
-		memory_bytes="$(sysctl -n hw.memsize 2>/dev/null)"
+                memory_bytes="$(sysctl -n hw.memsize 2>/dev/null)"
 
-		[[ -n "$memory_bytes" ]] || return 0
+                [[ -n "$memory_bytes" ]] || return 0
 
-		awk "BEGIN { printf \"%.0f MB\n\", $memory_bytes / 1024 / 1024 }"
-	fi
+                awk "BEGIN { printf \"%.0f MB\n\", $memory_bytes / 1024 / 1024 }"
+        fi
 
 }
 
@@ -134,13 +134,13 @@ get_memory_total() {
 
 get_storage_total() {
 
-	df -h "$HOME" | awk 'NR==2 {print $2}'
+        df -h "$HOME" | awk 'NR==2 {print $2}'
 
 }
 
 get_storage_available() {
 
-	df -h "$HOME" | awk 'NR==2 {print $4}'
+        df -h "$HOME" | awk 'NR==2 {print $4}'
 
 }
 
@@ -150,11 +150,11 @@ get_storage_available() {
 
 get_termux_version() {
 
-	if command -v termux-info >/dev/null 2>&1; then
-		termux-info | awk -F': ' '/TERMUX_VERSION/ {print $2}'
-	else
-		echo "Unknown"
-	fi
+        if command -v termux-info >/dev/null 2>&1; then
+                termux-info | awk -F': ' '/TERMUX_VERSION/ {print $2}'
+        else
+                echo "Unknown"
+        fi
 
 }
 
@@ -164,7 +164,7 @@ get_termux_version() {
 
 get_hostname() {
 
-	hostname
+        hostname
 
 }
 
@@ -174,33 +174,33 @@ get_hostname() {
 
 get_pkg_version() {
 
-	command -v pkg >/dev/null 2>&1 || return 0
+        command -v pkg >/dev/null 2>&1 || return 0
 
-	pkg --version 2>/dev/null | head -n1
+        pkg --version 2>/dev/null | head -n1
 
 }
 
 get_python_version() {
 
-	python --version 2>/dev/null
+        python --version 2>/dev/null
 
 }
 
 get_go_version() {
 
-	go version 2>/dev/null
+        go version 2>/dev/null
 
 }
 
 get_rust_version() {
 
-	rustc --version 2>/dev/null
+        rustc --version 2>/dev/null
 
 }
 
 get_node_version() {
 
-	node --version 2>/dev/null
+        node --version 2>/dev/null
 
 }
 
@@ -210,13 +210,13 @@ get_node_version() {
 
 system_detect() {
 
-	SYSTEM_OS="$(get_os)"
-	SYSTEM_KERNEL="$(get_kernel)"
-	SYSTEM_ARCH="$(get_architecture)"
+        SYSTEM_OS="$(get_os)"
+        SYSTEM_KERNEL="$(get_kernel)"
+        SYSTEM_ARCH="$(get_architecture)"
 
-	export SYSTEM_OS
-	export SYSTEM_KERNEL
-	export SYSTEM_ARCH
+        export SYSTEM_OS
+        export SYSTEM_KERNEL
+        export SYSTEM_ARCH
 
 }
 
@@ -226,7 +226,7 @@ system_detect() {
 
 system_summary() {
 
-	cat <<EOF
+        cat <<EOF
 
 Project       : ${PROJECT_NAME}
 Version       : ${PROJECT_VERSION}

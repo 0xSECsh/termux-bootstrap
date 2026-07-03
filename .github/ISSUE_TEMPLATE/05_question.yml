@@ -1,0 +1,49 @@
+
+name: Question
+description: Ask a question about usage or development
+title: "question: "
+labels: ["question"]
+projects: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have you checked the [FAQ](https://github.com/0xSECsh/termux-bootstrap/blob/main/FAQ.md)
+        and [documentation](https://github.com/0xSECsh/termux-bootstrap#readme) first?
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      placeholder: How do I...?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What are you trying to achieve?
+      placeholder: "I'm trying to..."
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: What version and device?
+      placeholder: "v0.1.0, Android 14, Pixel 8"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission Checks
+      options:
+        - label: I have checked the FAQ
+          required: true
+        - label: I have searched existing issues
+          required: true

@@ -16,10 +16,17 @@ readonly PROJECT_AUTHOR="0xSEC"
 readonly PROJECT_REPOSITORY="https://github.com/0xSECsh/termux-bootstrap"
 
 # ------------------------------------------------------------------------------
-# Version
+# Version (single source: VERSION file at project root)
 # ------------------------------------------------------------------------------
 
-readonly PROJECT_VERSION="0.1.0"
+_VERSION_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/VERSION"
+readonly _VERSION_FILE
+if [[ -f "$_VERSION_FILE" ]]; then
+        PROJECT_VERSION="$(<"$_VERSION_FILE")"
+else
+        PROJECT_VERSION="0.1.0"
+fi
+readonly PROJECT_VERSION
 
 # ------------------------------------------------------------------------------
 # Directories
@@ -29,7 +36,10 @@ readonly HOME_DIR="${HOME}"
 
 readonly CONFIG_DIR="${HOME_DIR}/.config/${PROJECT_SLUG}"
 
-readonly CONFIGS_DIR="${LIB_DIR}/../configs"
+if [[ -z "${CONFIGS_DIR:-}" ]]; then
+        CONFIGS_DIR="${LIB_DIR}/../configs"
+fi
+readonly CONFIGS_DIR
 
 readonly CACHE_DIR="${HOME_DIR}/.cache/${PROJECT_SLUG}"
 
@@ -132,45 +142,45 @@ readonly TRUE=0
 readonly FALSE=1
 
 export \
-	PROJECT_NAME \
-	PROJECT_SLUG \
-	PROJECT_AUTHOR \
-	PROJECT_REPOSITORY \
-	PROJECT_VERSION \
-	HOME_DIR \
-	CONFIG_DIR \
-	CONFIGS_DIR \
-	CACHE_DIR \
-	DATA_DIR \
-	LOG_DIR \
-	BACKUP_DIR \
-	TEMP_DIR \
-	LOG_FILE \
-	ERROR_LOG \
-	PKG_MANAGER \
-	PIP_MANAGER \
-	NPM_MANAGER \
-	CARGO_MANAGER \
-	GO_MANAGER \
-	GITCONFIG \
-	ZSHRC \
-	TMUXCONF \
-	FASTFETCH_CONFIG \
-	ARCH_ARM64 \
-	ARCH_ARM \
-	ARCH_X86_64 \
-	GITHUB_RAW \
-	GITHUB_API \
-	EXIT_SUCCESS \
-	EXIT_FAILURE \
-	EXIT_INVALID_ARGUMENT \
-	EXIT_DEPENDENCY_ERROR \
-	EXIT_NETWORK_ERROR \
-	EXIT_PERMISSION_ERROR \
-	DEFAULT_TIMEOUT \
-	DEFAULT_RETRIES \
-	DEFAULT_LOG_LEVEL \
-	DEFAULT_EDITOR \
-	DEFAULT_SHELL \
-	TRUE \
-	FALSE
+        PROJECT_NAME \
+        PROJECT_SLUG \
+        PROJECT_AUTHOR \
+        PROJECT_REPOSITORY \
+        PROJECT_VERSION \
+        HOME_DIR \
+        CONFIG_DIR \
+        CONFIGS_DIR \
+        CACHE_DIR \
+        DATA_DIR \
+        LOG_DIR \
+        BACKUP_DIR \
+        TEMP_DIR \
+        LOG_FILE \
+        ERROR_LOG \
+        PKG_MANAGER \
+        PIP_MANAGER \
+        NPM_MANAGER \
+        CARGO_MANAGER \
+        GO_MANAGER \
+        GITCONFIG \
+        ZSHRC \
+        TMUXCONF \
+        FASTFETCH_CONFIG \
+        ARCH_ARM64 \
+        ARCH_ARM \
+        ARCH_X86_64 \
+        GITHUB_RAW \
+        GITHUB_API \
+        EXIT_SUCCESS \
+        EXIT_FAILURE \
+        EXIT_INVALID_ARGUMENT \
+        EXIT_DEPENDENCY_ERROR \
+        EXIT_NETWORK_ERROR \
+        EXIT_PERMISSION_ERROR \
+        DEFAULT_TIMEOUT \
+        DEFAULT_RETRIES \
+        DEFAULT_LOG_LEVEL \
+        DEFAULT_EDITOR \
+        DEFAULT_SHELL \
+        TRUE \
+        FALSE

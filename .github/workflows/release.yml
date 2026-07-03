@@ -1,0 +1,227 @@
+# ==============================================================================
+# Release — Tagged Release Pipeline
+# ==============================================================================
+# Triggered when a tag matching v* is pushed or a release is published.
+#
+# Pipeline:
+#   validate    → CI pipeline (lint, test, coverage)
+#   preflight   → Version check, changelog verification, build verification
+#   package     → Archive, checksums, release notes
+#   release     → Publish GitHub Release with artifacts
+# ==============================================================================
+
+name: Release
+
+on:
+  release:
+    types:
+      - published
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  PROJECT_SLUG: termux-bootstrap
+
+jobs:
+  validate:
+    name: Validate
+    uses: ./.github/workflows/ci-pipeline.yml
+    with:
+      bash-version: "system"
+      ref: ${{ github.ref }}
+
+  preflight:
+    name: Preflight Checks
+    needs: [validate]
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.parse-version.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+
+      - name: Parse version from tag
+        id: parse-version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "Tag version: ${VERSION}"
+
+      - name: Verify VERSION file matches tag
+        run: |
+          FILE_VERSION="$(< VERSION)"
+          FILE_VERSION="$(echo "$FILE_VERSION" | tr -d '[:space:]')"
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [[ "$FILE_VERSION" != "$TAG_VERSION" ]]; then
+            echo "::error::VERSION file (${FILE_VERSION}) does not match tag (${TAG_VERSION})"
+            exit 1
+          fi
+          echo "VERSION file matches tag: ${FILE_VERSION}"
+
+      - name: Run version validation
+        run: |
+          if ! ./tools/validate-version.sh; then
+            echo "::error::Version validation failed"
+            exit 1
+          fi
+
+      - name: Run build verification (fast mode)
+        run: |
+          if ! ./tools/verify-build.sh --fast; then
+            echo "::error::Build verification failed"
+            exit 1
+          fi
+
+      - name: Verify CHANGELOG is up to date
+        id: changelog
+        run: |
+          if ./tools/gen-changelog.sh --verify 2>/dev/null; then
+            echo "CHANGELOG is up to date"
+          else
+            echo "::warning::CHANGELOG may be outdated — review before publishing"
+          fi
+          # Extract changelog for the current version
+          VERSION="$(< VERSION)"
+          VERSION="$(echo "$VERSION" | tr -d '[:space:]')"
+          CHANGELOG_SECTION="$(awk "/^## \\[${VERSION}\\]/,/^## \\[|^---/" CHANGELOG.md | head -n -2 2>/dev/null || echo '')"
+          {
+            echo "changelog<<EOF"
+            echo "${CHANGELOG_SECTION}"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
+  package:
+    name: Package
+    needs: [preflight]
+    runs-on: ubuntu-24.04
+    outputs:
+      archive: ${{ steps.create-archive.outputs.archive }}
+      checksum: ${{ steps.checksum.outputs.checksum }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Create release archive
+        id: create-archive
+        run: |
+          VERSION="${{ needs.preflight.outputs.version }}"
+          ARCHIVE="${PROJECT_SLUG}-${VERSION}.tar.gz"
+          tar --exclude='.git' \
+              --exclude='.github' \
+              --exclude='node_modules' \
+              --exclude='test-reports' \
+              --exclude='coverage-output' \
+              --exclude='target' \
+              -czf "/tmp/${ARCHIVE}" .
+          echo "archive=${ARCHIVE}" >> "${GITHUB_OUTPUT}"
+          echo "archive-path=/tmp/${ARCHIVE}" >> "${GITHUB_OUTPUT}"
+          echo "### Release Archive" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- **Archive:** ${ARCHIVE}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- **Size:** $(du -h /tmp/${ARCHIVE} | cut -f1)" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Generate checksums
+        id: checksum
+        run: |
+          ARCHIVE_PATH="/tmp/${{ steps.create-archive.outputs.archive }}"
+          sha256sum "${ARCHIVE_PATH}" > /tmp/checksums.txt
+          sha256="$(cut -d' ' -f1 /tmp/checksums.txt)"
+          echo "checksum=${sha256}" >> "${GITHUB_OUTPUT}"
+          echo "- **SHA256:** ${sha256}" >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          VERSION="${{ needs.preflight.outputs.version }}"
+          NOTES=$(./tools/gen-release-notes.sh "v${VERSION}")
+          {
+            echo "notes<<EOF"
+            echo "${NOTES}"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Upload release archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-archive
+          path: /tmp/${PROJECT_SLUG}-*.tar.gz
+          retention-days: 90
+
+      - name: Upload checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-checksums
+          path: /tmp/checksums.txt
+          retention-days: 90
+
+  release:
+    name: Publish Release
+    needs: [validate, preflight, package]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: /tmp/release-artifacts/
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.preflight.outputs.version }}"
+          ARCHIVE="${{ needs.package.outputs.archive }}"
+          CHECKSUM="${{ needs.package.outputs.checksum }}"
+
+          # Generate release notes body
+          NOTES=$(./tools/gen-release-notes.sh "v${VERSION}")
+          CHANGELOG_SECTION="${{ needs.preflight.outputs.changelog }}"
+
+          gh release create "v${VERSION}" \
+            --title "Termux Bootstrap v${VERSION}" \
+            --notes "${NOTES}" \
+            /tmp/release-artifacts/${ARCHIVE}#${PROJECT_SLUG}-${VERSION}.tar.gz \
+            /tmp/release-artifacts/checksums.txt#checksums.txt
+
+  summary:
+    name: Release Summary
+    needs: [validate, preflight, package, release]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Generate summary
+        run: |
+          {
+            echo "## Release Complete"
+            echo ""
+            echo "**Ref:** ${{ github.ref_name }}"
+            echo "**Version:** ${{ needs.preflight.outputs.version || 'unknown' }}"
+            echo ""
+            echo "### Pipeline Jobs"
+            echo ""
+            echo "| Job | Status |"
+            echo "|-----|--------|"
+            echo "| Validation (CI) | ${{ needs.validate.result == 'success' && '✅ Passed' || needs.validate.result == 'skipped' && '⏭️ Skipped' || '❌ Failed' }} |"
+            echo "| Preflight | ${{ needs.preflight.result == 'success' && '✅ Passed' || '❌ Failed' }} |"
+            echo "| Packaging | ${{ needs.package.result == 'success' && '✅ Passed' || '❌ Failed' }} |"
+            echo "| Release | ${{ needs.release.result == 'success' && '✅ Published' || needs.release.result == 'skipped' && '⏭️ Skipped (triggered by tag push)' || '❌ Failed' }} |"
+          } >> "${GITHUB_STEP_SUMMARY}"

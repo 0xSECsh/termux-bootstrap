@@ -1,23 +1,25 @@
 #!/usr/bin/env bash
 #
 # ==============================================================================
-# Time Helpers
+# Termux Bootstrap
+# File: utils/time.sh
+# Description: Time utilities — timestamps, epoch, sleep
 # ==============================================================================
 
 timestamp() {
 
-	date +"%Y-%m-%d %H:%M:%S"
+        date +"%Y-%m-%d %H:%M:%S"
 
 }
 
 epoch() {
 
-	date +%s
+        date +%s
 
 }
 
 pause() {
 
-	sleep "${1:-1}"
+        sleep "${1:-1}"
 
 }

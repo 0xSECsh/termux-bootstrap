@@ -8,8 +8,9 @@
 
 install_development_containers() {
 
-	pkg_install_many \
-		docker \
-		podman
+        # Docker and Podman have no supported daemon on a non-rooted Android
+        # kernel and are not in the Termux repositories. proot-distro is the
+        # standard Termux way to run full Linux distributions.
+        pkg_install proot-distro
 
 }

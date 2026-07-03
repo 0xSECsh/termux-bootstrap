@@ -19,23 +19,23 @@
 
 ui_box() {
 
-	local message="$1"
+        local message="$1"
 
-	local width=$((${#message} + 4))
+        local width=$((${#message} + 4))
 
-	printf "┌"
+        printf "┌"
 
-	printf "%${width}s" "" | tr " " "─"
+        printf "%${width}s" "" | tr " " "─"
 
-	printf "┐\n"
+        printf "┐\n"
 
-	printf "│  %s  │\n" "$message"
+        printf "│  %s  │\n" "$message"
 
-	printf "└"
+        printf "└"
 
-	printf "%${width}s" "" | tr " " "─"
+        printf "%${width}s" "" | tr " " "─"
 
-	printf "┘\n"
+        printf "┘\n"
 
 }
 
@@ -45,27 +45,27 @@ ui_box() {
 
 ui_header() {
 
-	local title="$1"
+        local title="$1"
 
-	terminal_clear
+        terminal_clear
 
-	separator
+        separator
 
-	title "$title"
+        title "$title"
 
-	separator
+        separator
 
 }
 
 ui_section() {
 
-	local title="$1"
+        local title="$1"
 
-	printf "\n"
+        printf "\n"
 
-	colorize "${BOLD}${CYAN}" "$title"
+        colorize "${BOLD}${CYAN}" "$title"
 
-	separator
+        separator
 
 }
 
@@ -75,45 +75,45 @@ ui_section() {
 
 ui_confirm() {
 
-	local message="$1"
+        local message="$1"
 
-	local answer
+        local answer
 
-	while true; do
+        while true; do
 
-		printf "%s [y/N]: " "$message"
+                printf "%s [y/N]: " "$message"
 
-		read -r answer
+                read -r answer
 
-		case "${answer,,}" in
+                case "${answer,,}" in
 
-		y | yes)
+                        y | yes)
 
-			return 0
-			;;
+                                return 0
+                                ;;
 
-		"" | n | no)
+                        "" | n | no)
 
-			return 1
-			;;
+                                return 1
+                                ;;
 
-		*)
+                        *)
 
-			colorize "$YELLOW" "Please answer yes or no."
+                                colorize "$YELLOW" "Please answer yes or no."
 
-			;;
+                                ;;
 
-		esac
+                esac
 
-	done
+        done
 
 }
 
 ui_pause() {
 
-	printf "\nPress ENTER to continue..."
+        printf "\nPress ENTER to continue..."
 
-	read -r
+        read -r
 
 }
 
@@ -123,39 +123,39 @@ ui_pause() {
 
 ui_menu() {
 
-	local title="$1"
+        local title="$1"
 
-	shift
+        shift
 
-	ui_section "$title"
+        ui_section "$title"
 
-	local index=1
+        local index=1
 
-	local option
+        local option
 
-	for option in "$@"; do
+        for option in "$@"; do
 
-		printf " %2d) %s\n" "$index" "$option"
+                printf " %2d) %s\n" "$index" "$option"
 
-		((index++))
+                ((index++))
 
-	done
+        done
 
-	printf "\n"
+        printf "\n"
 
 }
 
 ui_select() {
 
-	local prompt="${1:-Select an option}"
+        local prompt="${1:-Select an option}"
 
-	local choice
+        local choice
 
-	printf "%s: " "$prompt"
+        printf "%s: " "$prompt"
 
-	read -r choice
+        read -r choice
 
-	printf "%s" "$choice"
+        printf "%s" "$choice"
 
 }
 
@@ -165,25 +165,25 @@ ui_select() {
 
 ui_success() {
 
-	colorize "$GREEN" "✔ $1"
+        colorize "$GREEN" "✔ $1"
 
 }
 
 ui_warning() {
 
-	colorize "$YELLOW" "⚠ $1"
+        colorize "$YELLOW" "⚠ $1"
 
 }
 
 ui_error() {
 
-	colorize "$RED" "✖ $1"
+        colorize "$RED" "✖ $1"
 
 }
 
 ui_info() {
 
-	colorize "$BLUE" "➜ $1"
+        colorize "$BLUE" "➜ $1"
 
 }
 
@@ -193,13 +193,13 @@ ui_info() {
 
 ui_key_value() {
 
-	printf "%-20s : %s\n" "$1" "$2"
+        printf "%-20s : %s\n" "$1" "$2"
 
 }
 
 ui_separator() {
 
-	separator
+        separator
 
 }
 
@@ -209,13 +209,13 @@ ui_separator() {
 
 ui_bullet() {
 
-	printf " • %s\n" "$1"
+        printf " • %s\n" "$1"
 
 }
 
 ui_numbered() {
 
-	printf "%2d. %s\n" "$1" "$2"
+        printf "%2d. %s\n" "$1" "$2"
 
 }
 
@@ -225,7 +225,7 @@ ui_numbered() {
 
 ui_banner() {
 
-	show_banner
+        show_banner
 
 }
 
@@ -235,22 +235,22 @@ ui_banner() {
 
 ui_summary() {
 
-	local title="$1"
+        local title="$1"
 
-	shift
+        shift
 
-	printf "\n"
+        printf "\n"
 
-	ui_section "$title"
+        ui_section "$title"
 
-	local item
+        local item
 
-	for item in "$@"; do
+        for item in "$@"; do
 
-		ui_bullet "$item"
+                ui_bullet "$item"
 
-	done
+        done
 
-	printf "\n"
+        printf "\n"
 
 }

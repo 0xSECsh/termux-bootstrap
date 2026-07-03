@@ -1,31 +1,33 @@
 #!/usr/bin/env bash
 #
 # ==============================================================================
-# Retry Helpers
+# Termux Bootstrap
+# File: utils/retry.sh
+# Description: Retry wrapper with configurable attempts
 # ==============================================================================
 
 retry() {
 
-	local attempts="$1"
+        local attempts="$1"
 
-	shift
+        shift
 
-	[[ $# -gt 0 ]] || return 1
+        [[ $# -gt 0 ]] || return 1
 
-	local count=1
+        local count=1
 
-	until "$@"; do
+        until "$@"; do
 
-		if ((count >= attempts)); then
+                if ((count >= attempts)); then
 
-			return 1
+                        return 1
 
-		fi
+                fi
 
-		((count++))
+                ((count++))
 
-		sleep 1
+                sleep 1
 
-	done
+        done
 
 }

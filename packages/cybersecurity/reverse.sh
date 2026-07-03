@@ -8,10 +8,10 @@
 
 install_cybersecurity_reverse() {
 
-	pkg_install_many \
-		radare2 \
-		gdb \
-		strace \
-		ltrace
+        pkg_install_many \
+                radare2 \
+                gdb \
+                strace \
+                ltrace
 
 }

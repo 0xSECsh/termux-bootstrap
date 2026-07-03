@@ -8,7 +8,7 @@
 
 install_development_rust() {
 
-	pkg_install_many \
-		rust
+        pkg_install_many \
+                rust
 
 }

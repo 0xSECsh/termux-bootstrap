@@ -1,0 +1,66 @@
+
+name: Configuration Issue
+description: Report a problem with configuration management
+title: "config: "
+labels: ["configuration"]
+projects: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report issues with config merge, validation, or management.
+
+  - type: dropdown
+    id: app
+    attributes:
+      label: Affected Application
+      description: Which configuration is affected?
+      options:
+        - git
+        - zsh
+        - tmux
+        - nvim
+        - micro
+        - fastfetch
+        - framework
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What went wrong?
+      placeholder: "Config merge overwrote custom settings"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction
+      description: Steps to reproduce
+      placeholder: |
+        1. Run './bootstrap.sh config merge git'
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Config Content
+      description: Show the relevant config file content
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission Checks
+      options:
+        - label: I have searched existing issues for duplicates
+          required: true

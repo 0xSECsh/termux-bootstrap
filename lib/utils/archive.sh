@@ -1,38 +1,40 @@
 #!/usr/bin/env bash
 #
 # ==============================================================================
-# Archive Helpers
+# Termux Bootstrap
+# File: utils/archive.sh
+# Description: Archive extraction — zip, tar.gz, tar.xz
 # ==============================================================================
 
 extract() {
 
-	case "$1" in
+        case "$1" in
 
-	*.zip)
+                *.zip)
 
-		unzip -- "$1"
-		;;
+                        unzip -- "$1"
+                        ;;
 
-	*.tar.gz | *.tgz)
+                *.tar.gz | *.tgz)
 
-		tar -xzf "$1"
-		;;
+                        tar -xzf "$1"
+                        ;;
 
-	*.tar.xz)
+                *.tar.xz)
 
-		tar -xJf "$1"
-		;;
+                        tar -xJf "$1"
+                        ;;
 
-	*.tar)
+                *.tar)
 
-		tar -xf "$1"
-		;;
+                        tar -xf "$1"
+                        ;;
 
-	*)
+                *)
 
-		return 1
-		;;
+                        return 1
+                        ;;
 
-	esac
+        esac
 
 }
