@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
-# Description: Test module core/editors
-# Depends:
+#
+# ==============================================================================
+# Termux Bootstrap
+# File: packages/core/editors.sh
+# Description: Text editor packages
+# ==============================================================================
 
 install_core_editors() {
-        return 0
+
+        pkg_install_many \
+                nano \
+                vim
+
 }

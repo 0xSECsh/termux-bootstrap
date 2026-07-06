@@ -1,0 +1,26 @@
+# Termux Bootstrap - Default Configuration
+# This file contains default settings for the framework.
+# User overrides should be placed in config/user.yaml.
+
+# Framework settings
+framework:
+  # Default profile to install
+  default_profile: minimal
+  # Enable verbose output
+  verbose: false
+  # Enable debug output
+  debug: false
+
+# Package manager settings
+packages:
+  # Auto-update package database before install
+  auto_update: true
+  # Remove unused packages after install
+  auto_clean: false
+
+# Configuration management
+config:
+  # Backup existing configs before overwrite
+  backup: true
+  # Merge strategy: merge | overwrite
+  strategy: merge

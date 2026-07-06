@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/cybersecurity/osint.sh
 # Description: OSINT (Open Source Intelligence) packages
+# Depends: core/base
 # ==============================================================================
 
 install_cybersecurity_osint() {

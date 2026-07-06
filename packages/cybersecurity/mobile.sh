@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/cybersecurity/mobile.sh
 # Description: Mobile security analysis packages
+# Depends: core/base
 # ==============================================================================
 
 install_cybersecurity_mobile() {

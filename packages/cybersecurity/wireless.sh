@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/cybersecurity/wireless.sh
 # Description: Wireless security audit packages
+# Depends: core/base
 # ==============================================================================
 
 install_cybersecurity_wireless() {

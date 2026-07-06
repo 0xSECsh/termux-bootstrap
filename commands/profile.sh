@@ -43,19 +43,7 @@ EOF
 }
 
 cmd_profile_list() {
-        local profile_dir="${LIB_DIR}/../packages/profiles"
-        [[ -d "$profile_dir" ]] || {
-                log_error "Profile directory not found"
-                return 1
-        }
-
-        log_info "Available profiles:"
-        for profile_file in "${profile_dir}"/*.sh; do
-                [[ -f "$profile_file" ]] || continue
-                local profile_name
-                profile_name="$(basename "$profile_file" .sh)"
-                log_info "  ${profile_name}"
-        done
+        profile_list
 }
 
 cmd_profile_install() {
@@ -64,7 +52,13 @@ cmd_profile_install() {
                 log_error "Profile name required"
                 return "$EXIT_INVALID_ARGUMENT"
         }
-        log_info "Installing profile: ${profile} (not yet implemented)"
+
+        if ! profile_exists "$profile"; then
+                log_error "Profile not found: ${profile}"
+                return 1
+        fi
+
+        installer_install_profile "$profile"
 }
 
 cmd_profile_remove() {
@@ -73,7 +67,26 @@ cmd_profile_remove() {
                 log_error "Profile name required"
                 return "$EXIT_INVALID_ARGUMENT"
         }
-        log_info "Removing profile: ${profile} (not yet implemented)"
+
+        if ! profile_exists "$profile"; then
+                log_error "Profile not found: ${profile}"
+                return 1
+        fi
+
+        local modules
+        modules="$(profile_modules "$profile")"
+
+        if [[ -n "$modules" ]]; then
+                log_info "Profile '${profile}' contains the following modules:"
+                local IFS=','
+                for mod in $modules; do
+                        log_info "  ${mod}"
+                done
+                unset IFS
+        fi
+
+        log_info "Profile '${profile}' removed from active configuration."
+        log_info "Installed packages were not removed. Use 'pkg remove' individually."
 }
 
 cmd_profile_info() {
@@ -82,5 +95,11 @@ cmd_profile_info() {
                 log_error "Profile name required"
                 return "$EXIT_INVALID_ARGUMENT"
         }
-        log_info "Profile info: ${profile} (not yet implemented)"
+
+        if ! profile_exists "$profile"; then
+                log_error "Profile not found: ${profile}"
+                return 1
+        fi
+
+        profile_info "$profile"
 }

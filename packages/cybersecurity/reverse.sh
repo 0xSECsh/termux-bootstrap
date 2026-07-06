@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/cybersecurity/reverse.sh
 # Description: Reverse engineering packages
+# Depends: core/base
 # ==============================================================================
 
 install_cybersecurity_reverse() {

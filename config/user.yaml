@@ -1,0 +1,9 @@
+# Termux Bootstrap - User Configuration
+# Override default settings here.
+# This file is not modified by the framework.
+
+# Example:
+# framework:
+#   verbose: true
+# packages:
+#   auto_clean: true

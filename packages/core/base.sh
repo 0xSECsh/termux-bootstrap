@@ -1,7 +1,23 @@
 #!/usr/bin/env bash
-# Description: Test module core/base
-# Depends:
+#
+# ==============================================================================
+# Termux Bootstrap
+# File: packages/core/base.sh
+# Description: Essential base packages
+# ==============================================================================
 
 install_core_base() {
-        return 0
+
+        pkg_install_many \
+                git \
+                curl \
+                wget \
+                jq \
+                zip \
+                unzip \
+                tar \
+                gzip \
+                xz-utils \
+                openssh
+
 }

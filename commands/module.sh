@@ -43,45 +43,94 @@ EOF
 }
 
 cmd_module_list() {
-        log_info "Available modules:"
-        # Categories
-        local categories=(core development cybersecurity ai)
-        for cat in "${categories[@]}"; do
-                local cat_dir="${LIB_DIR}/../packages/${cat}"
-                [[ -d "$cat_dir" ]] || continue
-                log_info "  ${cat}:"
-                for mod_file in "${cat_dir}"/*.sh; do
-                        [[ -f "$mod_file" ]] || continue
-                        local mod_name
-                        mod_name="$(basename "$mod_file" .sh)"
-                        log_info "    ${mod_name}"
-                done
-        done
+        local filter_category="${1:-}"
+
+        if [[ -n "$filter_category" ]]; then
+                module_list "$filter_category"
+        else
+                module_list
+        fi
 }
 
 cmd_module_install() {
         local module="${1:-}"
         [[ -z "$module" ]] && {
-                log_error "Module name required"
+                log_error "Module name required (e.g., core/base)"
                 return "$EXIT_INVALID_ARGUMENT"
         }
-        log_info "Installing module: ${module} (not yet implemented)"
+
+        local category module_name
+        if [[ "$module" == *"/"* ]]; then
+                category="${module%%/*}"
+                module_name="${module#*/}"
+        else
+                log_error "Invalid module format: ${module} (expected category/module)"
+                return "$EXIT_INVALID_ARGUMENT"
+        fi
+
+        if ! module_exists "$category" "$module_name"; then
+                log_error "Module not found: ${category}/${module_name}"
+                return 1
+        fi
+
+        installer_install_module "$category" "$module_name"
 }
 
 cmd_module_remove() {
         local module="${1:-}"
         [[ -z "$module" ]] && {
-                log_error "Module name required"
+                log_error "Module name required (e.g., core/base)"
                 return "$EXIT_INVALID_ARGUMENT"
         }
-        log_info "Removing module: ${module} (not yet implemented)"
+
+        local category module_name
+        if [[ "$module" == *"/"* ]]; then
+                category="${module%%/*}"
+                module_name="${module#*/}"
+        else
+                log_error "Invalid module format: ${module} (expected category/module)"
+                return "$EXIT_INVALID_ARGUMENT"
+        fi
+
+        if ! module_exists "$category" "$module_name"; then
+                log_error "Module not found: ${category}/${module_name}"
+                return 1
+        fi
+
+        local sanitized="${module_name//-/_}"
+        local func_name="install_${category}_${sanitized}"
+
+        # Source the module file to get the package list
+        local module_file="${PACKAGES_DIR:-${LIB_DIR}/../packages}/${category}/${module_name}.sh"
+        if [[ -f "$module_file" ]]; then
+                # shellcheck disable=SC1090
+                source "$module_file"
+        fi
+
+        log_info "Module ${category}/${module_name} marked for removal."
+        log_info "Packages installed by this module should be removed individually."
 }
 
 cmd_module_info() {
         local module="${1:-}"
         [[ -z "$module" ]] && {
-                log_error "Module name required"
+                log_error "Module name required (e.g., core/base)"
                 return "$EXIT_INVALID_ARGUMENT"
         }
-        log_info "Module info: ${module} (not yet implemented)"
+
+        local category module_name
+        if [[ "$module" == *"/"* ]]; then
+                category="${module%%/*}"
+                module_name="${module#*/}"
+        else
+                log_error "Invalid module format: ${module} (expected category/module)"
+                return "$EXIT_INVALID_ARGUMENT"
+        fi
+
+        if ! module_exists "$category" "$module_name"; then
+                log_error "Module not found: ${category}/${module_name}"
+                return 1
+        fi
+
+        module_info "$category" "$module_name"
 }

@@ -4,6 +4,7 @@
 # Termux Bootstrap
 # File: packages/cybersecurity/recon.sh
 # Description: Reconnaissance and information gathering packages
+# Depends: core/base
 # ==============================================================================
 
 install_cybersecurity_recon() {

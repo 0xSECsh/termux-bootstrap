@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
-# Description: Test module core/utils
-# Depends:
+#
+# ==============================================================================
+# Termux Bootstrap
+# File: packages/core/utils.sh
+# Description: General utility packages
+# ==============================================================================
 
 install_core_utils() {
-        return 0
+
+        pkg_install_many \
+                fastfetch \
+                htop \
+                procps
+
 }

@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
-# Description: Test module core/shell
-# Depends:
+#
+# ==============================================================================
+# Termux Bootstrap
+# File: packages/core/shell.sh
+# Description: Shell and terminal enhancement packages
+# ==============================================================================
 
 install_core_shell() {
-        return 0
+
+        pkg_install_many \
+                zsh \
+                tmux \
+                tree
+
 }
