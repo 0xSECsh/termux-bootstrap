@@ -70,7 +70,7 @@ cmd_module_install() {
 
         if ! module_exists "$category" "$module_name"; then
                 log_error "Module not found: ${category}/${module_name}"
-                return 1
+                return "$EXIT_FAILURE"
         fi
 
         installer_install_module "$category" "$module_name"
@@ -94,7 +94,7 @@ cmd_module_remove() {
 
         if ! module_exists "$category" "$module_name"; then
                 log_error "Module not found: ${category}/${module_name}"
-                return 1
+                return "$EXIT_FAILURE"
         fi
 
         local sanitized="${module_name//-/_}"
@@ -129,7 +129,7 @@ cmd_module_info() {
 
         if ! module_exists "$category" "$module_name"; then
                 log_error "Module not found: ${category}/${module_name}"
-                return 1
+                return "$EXIT_FAILURE"
         fi
 
         module_info "$category" "$module_name"

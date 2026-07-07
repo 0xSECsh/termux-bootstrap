@@ -122,7 +122,7 @@ EOF
         local app_name filename
         if [[ "$target" == *"/"* ]]; then
                 app_name="$(printf "%s\n" "$target" | cut -d'/' -f1)"
-                filename="$(echo "$target" | cut -d'/' -f2)"
+                filename="$(printf "%s\n" "$target" | cut -d'/' -f2)"
         else
                 log_error "Usage: config edit <app/filename>"
                 log_info "Example: config edit zsh/.zshrc"
@@ -191,7 +191,7 @@ EOF
         local app_name filename
         if [[ "$target" == *"/"* ]]; then
                 app_name="$(printf "%s\n" "$target" | cut -d'/' -f1)"
-                filename="$(echo "$target" | cut -d'/' -f2)"
+                filename="$(printf "%s\n" "$target" | cut -d'/' -f2)"
         else
                 log_error "Usage: config reset <app/filename>"
                 log_info "Example: config reset zsh/.zshrc"
@@ -258,7 +258,7 @@ EOF
                 local app_name filename
                 if [[ "$target" == *"/"* ]]; then
                         app_name="$(printf "%s\n" "$target" | cut -d'/' -f1)"
-                        filename="$(echo "$target" | cut -d'/' -f2)"
+                        filename="$(printf "%s\n" "$target" | cut -d'/' -f2)"
                 else
                         log_error "Usage: config validate <app/filename>"
                         return "$EXIT_INVALID_ARGUMENT"
@@ -316,7 +316,7 @@ EOF
                 local app_name filename
                 if [[ "$target" == *"/"* ]]; then
                         app_name="$(printf "%s\n" "$target" | cut -d'/' -f1)"
-                        filename="$(echo "$target" | cut -d'/' -f2)"
+                        filename="$(printf "%s\n" "$target" | cut -d'/' -f2)"
                 else
                         log_error "Usage: config merge <app/filename>"
                         return "$EXIT_INVALID_ARGUMENT"

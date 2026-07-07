@@ -55,7 +55,7 @@ cmd_profile_install() {
 
         if ! profile_exists "$profile"; then
                 log_error "Profile not found: ${profile}"
-                return 1
+                return "$EXIT_FAILURE"
         fi
 
         installer_install_profile "$profile"
@@ -70,7 +70,7 @@ cmd_profile_remove() {
 
         if ! profile_exists "$profile"; then
                 log_error "Profile not found: ${profile}"
-                return 1
+                return "$EXIT_FAILURE"
         fi
 
         local modules
@@ -98,7 +98,7 @@ cmd_profile_info() {
 
         if ! profile_exists "$profile"; then
                 log_error "Profile not found: ${profile}"
-                return 1
+                return "$EXIT_FAILURE"
         fi
 
         profile_info "$profile"

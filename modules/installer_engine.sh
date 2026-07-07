@@ -48,7 +48,10 @@ _installer_rollback_push() {
 
         [[ "$_INSTALLER_ROLLBACK_ENABLED" == true ]] || return 0
 
-        _INSTALLER_ROLLBACK_STACK="${action}:${target}|${_INSTALLER_ROLLBACK_STACK}"
+        local escaped_target="$target"
+        escaped_target="${escaped_target//|/__PIPE__}"
+        escaped_target="${escaped_target//:/__COLON__}"
+        _INSTALLER_ROLLBACK_STACK="${action}:${escaped_target}|${_INSTALLER_ROLLBACK_STACK}"
 }
 
 _installer_rollback_pop() {
@@ -59,6 +62,8 @@ _installer_rollback_pop() {
 
         local action="${entry%%:*}"
         local target="${entry#*:}"
+        target="${target//__PIPE__/|}"
+        target="${target//__COLON__/:}"
 
         printf '%s %s' "$action" "$target"
 }
@@ -118,18 +123,18 @@ _installer_rollback_execute() {
 _installer_track_package() {
         local package="$1"
 
-        case "$_INSTALLER_INSTALLED_PACKAGES" in
-                *"|${package}|"*) return 0 ;;
-        esac
+        _installer_is_package_tracked "$package" && return 0
 
-        _INSTALLER_INSTALLED_PACKAGES="${_INSTALLER_INSTALLED_PACKAGES}|${package}|"
+        _INSTALLER_INSTALLED_PACKAGES="${_INSTALLER_INSTALLED_PACKAGES}|$(printf '%s' "$package" | base64 | tr -d '\n')|"
 }
 
 _installer_is_package_tracked() {
         local package="$1"
+        local encoded
+        encoded="$(printf '%s' "$package" | base64 | tr -d '\n')"
 
         case "$_INSTALLER_INSTALLED_PACKAGES" in
-                *"|${package}|"*) return 0 ;;
+                *"|${encoded}|"*) return 0 ;;
         esac
         return 1
 }
@@ -442,7 +447,7 @@ installer_installed_packages() {
 
         local entry
         for entry in "${entries[@]}"; do
-                [[ -n "$entry" ]] && printf '%s\n' "$entry"
+                [[ -n "$entry" ]] && printf '%s\n' "$(printf '%s' "$entry" | base64 -d 2>/dev/null || echo "$entry")"
         done
 }
 

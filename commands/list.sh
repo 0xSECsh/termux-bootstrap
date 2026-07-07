@@ -71,7 +71,7 @@ cmd_list() {
 _list_profiles() {
         if ! directory_exists "$PROFILE_DIR"; then
                 log_error "Profile directory not found: ${PROFILE_DIR}"
-                return 1
+                return "$EXIT_FAILURE"
         fi
 
         local profiles=()
@@ -117,7 +117,7 @@ _list_modules() {
                 cat_dir="${base_dir}/${filter_category}"
                 if ! directory_exists "$cat_dir"; then
                         log_error "Category not found: ${filter_category}"
-                        return 1
+                        return "$EXIT_FAILURE"
                 fi
 
                 cat_name="$filter_category"
